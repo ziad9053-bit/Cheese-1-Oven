@@ -59,7 +59,7 @@ export const ProductScene: React.FC<Props> = ({
 
       {/* Central pizza image — animates only when product changes */}
       <div className="relative z-40 w-full h-full flex items-center justify-center pointer-events-none">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.img
             key={product?.id}
             src={product?.image_url || ''}

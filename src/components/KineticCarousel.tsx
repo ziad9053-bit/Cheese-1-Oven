@@ -231,7 +231,7 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
           transform: `translate(-50%, ${RING_RADIUS + 14}px)`,
         }}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={products[activeIndex]?.id}
             initial={{ opacity: 0, y: 6  }}
