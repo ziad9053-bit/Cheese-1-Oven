@@ -87,8 +87,18 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
 
   return (
     <main className="fixed inset-0 overflow-hidden bg-black text-white flex flex-col">
-      <div className="absolute top-4 right-4 z-[100] text-xs text-white/50 bg-black/50 px-2 py-1 rounded-full pointer-events-none">
-        v1.5 (محترف)
+      {/* Admin Button — top left */}
+      <a
+        href="/admin"
+        className="absolute top-4 left-4 z-[100] flex items-center gap-1.5 bg-black/60 backdrop-blur-md border border-white/10 hover:border-pink-500/50 hover:bg-pink-900/20 text-white/60 hover:text-pink-300 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 select-none"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        المدير
+      </a>
+
+      {/* Version badge — top right */}
+      <div className="absolute top-4 right-4 z-[100] text-[10px] text-white/25 pointer-events-none select-none">
+        v2.0
       </div>
       
       {/* Layer 1 (z-10): Background + central pizza image */}
