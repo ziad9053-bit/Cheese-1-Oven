@@ -87,6 +87,9 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
 
   return (
     <main className="fixed inset-0 overflow-hidden bg-black text-white flex flex-col">
+      <div className="absolute top-4 right-4 z-50 text-xs text-white/50 bg-black/50 px-2 py-1 rounded-full pointer-events-none">
+        v1.2 (عجلة دائرية)
+      </div>
       <div className="flex-1 relative">
         {activeProduct ? (
           <ProductScene 
