@@ -204,12 +204,12 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
                   }
                 </div>
 
-                {ITEM_SIZE > 42 && (
+                {ITEM_SIZE > 30 && (
                   <p
-                    className="text-white font-semibold truncate text-center bg-black/60 backdrop-blur-sm rounded-full px-1.5 py-0.5 leading-tight"
+                    className="text-white font-bold truncate text-center bg-black/70 backdrop-blur-md rounded-full px-2 py-0.5 leading-tight"
                     style={{
-                      fontSize: Math.max(8, ITEM_SIZE * 0.15),
-                      maxWidth: ITEM_SIZE + 20,
+                      fontSize: Math.max(10, ITEM_SIZE * 0.18),
+                      maxWidth: ITEM_SIZE + 35,
                       opacity:  isActive ? 0.4 : 1,
                     }}
                   >
