@@ -43,8 +43,8 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
   const RING_RADIUS  = safeMobile ? 140 : 240;
   const STEP         = count > 0 ? 360 / count : 0;
   const arc          = 2 * Math.PI * RING_RADIUS;
-  const raw          = count > 0 ? (arc / count) * 0.80 : 72;
-  const ITEM_SIZE    = Math.min(safeMobile ? 54 : 70, Math.max(26, raw));
+  const raw          = count > 0 ? (arc / count) * 0.92 : 82;
+  const ITEM_SIZE    = Math.min(safeMobile ? 62 : 80, Math.max(30, raw));
   const CENTER_SIZE  = RING_RADIUS * 2;
 
   /* ─── DOM updater ────────────────────────────────────────────────── */
