@@ -26,22 +26,22 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
   useEffect(() => {
     if (mounted) {
       controls.start({
-        x: activeIndex * itemWidth, // RTL: positive x moves container to the right, showing items on the left
-        transition: { type: 'spring', stiffness: 300, damping: 30 }
+        rotate: activeIndex * 25, // Positive rotation in RTL for counter-clockwise items
+        transition: { type: 'spring', stiffness: 200, damping: 30 }
       });
     }
-  }, [activeIndex, controls, itemWidth, mounted]);
+  }, [activeIndex, controls, mounted]);
 
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handlePanEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const offset = info.offset.x;
     const velocity = info.velocity.x;
     
     let newIndex = activeIndex;
     
     // In RTL, dragging right (positive) reveals items on the left (next items)
-    if (offset > 50 || velocity > 500) {
+    if (offset > 40 || velocity > 400) {
       newIndex = Math.min(activeIndex + 1, products.length - 1);
-    } else if (offset < -50 || velocity < -500) {
+    } else if (offset < -40 || velocity < -400) {
       newIndex = Math.max(activeIndex - 1, 0);
     }
     
@@ -50,67 +50,81 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
 
   if (!mounted || products.length === 0) return null;
 
+  const radius = 280;
+  const stepAngle = 25;
+
   return (
-    <div 
-      className="relative w-full h-[140px] overflow-hidden flex items-center bg-black/40 backdrop-blur-md border-t border-white/10"
-      ref={containerRef}
+    <motion.div 
+      onPanEnd={handlePanEnd}
+      className="relative w-full h-[180px] overflow-hidden flex items-center justify-center bg-black/40 backdrop-blur-md border-t border-white/10 touch-none"
     >
-      <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/80 to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[120px] bg-gradient-to-b from-primary/20 to-transparent pointer-events-none z-0" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-8 bg-primary/30 blur-2xl rounded-full" />
 
-      <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[110px] border-x-2 border-primary/50 bg-primary/10 z-0" />
-
+      {/* The invisible spinning wheel */}
       <motion.div
-        drag="x"
-        dragConstraints={{
-          left: 0,
-          right: (products.length - 1) * itemWidth
-        }}
-        dragElastic={0.2}
-        onDragEnd={handleDragEnd}
         animate={controls}
-        className="flex items-center gap-[16px] px-[calc(50%-50px)]"
-        style={{ width: 'max-content' }}
+        className="absolute"
+        style={{
+          width: radius * 2,
+          height: radius * 2,
+          bottom: -(radius * 2) + 120, // centers the active item nicely
+          left: '50%',
+          x: '-50%',
+          borderRadius: '50%',
+          zIndex: 10,
+        }}
       >
         {products.map((product, index) => {
+          const itemAngle = -index * stepAngle; // Items distributed counter-clockwise for RTL
           const isActive = index === activeIndex;
           
           return (
             <motion.div
               key={product.id}
-              className="relative shrink-0 flex flex-col items-center justify-center cursor-pointer"
-              style={{ width: cardWidth }}
-              onClick={() => onIndexChange(index)}
-              animate={{
-                scale: isActive ? 1.1 : 0.85,
-                opacity: isActive ? 1 : 0.5,
-                y: isActive ? -10 : 0
-              }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="absolute top-1/2 left-1/2"
+              style={{ rotate: itemAngle }}
             >
-              <div className={`w-[80px] h-[80px] rounded-full overflow-hidden shadow-xl border-2 transition-colors ${isActive ? 'border-primary ring-4 ring-primary/30' : 'border-white/10'}`}>
-                {product.image_url ? (
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-800 flex items-center justify-center text-xs text-gray-500">No Image</div>
-                )}
-              </div>
-              <div className="mt-3 text-center w-full">
-                <p className={`text-xs font-bold truncate transition-colors ${isActive ? 'text-white' : 'text-white/60'}`}>
-                  {product.name}
-                </p>
-                <p className={`text-[10px] font-black transition-colors ${isActive ? 'text-primary' : 'text-white/40'}`}>
-                  {product.price} ر.س
-                </p>
-              </div>
+              <motion.div style={{ y: -radius }}>
+                <motion.div
+                  className="flex flex-col items-center justify-center cursor-pointer absolute"
+                  style={{ x: '-50%', y: '-50%' }}
+                  animate={{
+                    // Counter rotate so text and pizza stay upright!
+                    rotate: -itemAngle - (activeIndex * stepAngle),
+                    scale: isActive ? 1.15 : 0.75,
+                    opacity: isActive ? 1 : 0.4,
+                  }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                  onClick={() => onIndexChange(index)}
+                >
+                  <div className={`w-[80px] h-[80px] rounded-full overflow-hidden shadow-2xl border-2 transition-colors duration-300 ${isActive ? 'border-primary ring-4 ring-primary/40' : 'border-white/10'}`}>
+                    {product.image_url ? (
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-800 flex items-center justify-center text-xs text-gray-500">بدون صورة</div>
+                    )}
+                  </div>
+                  
+                  <div className={`mt-3 text-center w-28 transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+                    <p className="text-sm font-bold text-white truncate drop-shadow-md">
+                      {product.name}
+                    </p>
+                    <p className="text-xs font-black text-primary drop-shadow-md">
+                      {product.price} ر.س
+                    </p>
+                  </div>
+                </motion.div>
+              </motion.div>
             </motion.div>
           );
         })}
       </motion.div>
-    </div>
+    </motion.div>
   );
 };
