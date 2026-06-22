@@ -42,7 +42,7 @@ export const ProductScene: React.FC<Props> = ({
   }, [bgImageUrl, loadedBg]);
 
   const safeIsMobile = mounted ? isMobile : false;
-  const pizzaRadius = safeIsMobile ? 110 : 185;
+  const pizzaRadius = safeIsMobile ? 88 : 145;
   const sauceRadius = safeIsMobile ? 80 : 130; 
   
   const startAngle = 180;
@@ -193,9 +193,11 @@ export const ProductScene: React.FC<Props> = ({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -4, opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="bg-black/90 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/30 shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
+              className="px-2 py-1 flex items-center justify-center drop-shadow-xl"
             >
-              <span className="text-sm md:text-base font-black text-pink-500 whitespace-nowrap">{product.price} ر.س</span>
+              <span className="text-xl md:text-3xl font-black text-pink-500 whitespace-nowrap drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] [text-shadow:_-1.5px_-1.5px_0_#FFF,_1.5px_-1.5px_0_#FFF,_-1.5px_1.5px_0_#FFF,_1.5px_1.5px_0_#FFF]">
+                {product.price} ر.س
+              </span>
             </motion.div>
           </AnimatePresence>
         </div>
