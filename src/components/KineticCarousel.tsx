@@ -26,7 +26,7 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
   useEffect(() => {
     if (mounted) {
       controls.start({
-        x: -activeIndex * itemWidth,
+        x: activeIndex * itemWidth, // RTL: positive x moves container to the right, showing items on the left
         transition: { type: 'spring', stiffness: 300, damping: 30 }
       });
     }
@@ -38,9 +38,10 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
     
     let newIndex = activeIndex;
     
-    if (offset < -50 || velocity < -500) {
+    // In RTL, dragging right (positive) reveals items on the left (next items)
+    if (offset > 50 || velocity > 500) {
       newIndex = Math.min(activeIndex + 1, products.length - 1);
-    } else if (offset > 50 || velocity > 500) {
+    } else if (offset < -50 || velocity < -500) {
       newIndex = Math.max(activeIndex - 1, 0);
     }
     
@@ -62,8 +63,8 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
       <motion.div
         drag="x"
         dragConstraints={{
-          left: -((products.length - 1) * itemWidth),
-          right: 0
+          left: 0,
+          right: (products.length - 1) * itemWidth
         }}
         dragElastic={0.2}
         onDragEnd={handleDragEnd}
