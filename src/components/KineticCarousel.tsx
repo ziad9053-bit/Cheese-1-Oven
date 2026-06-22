@@ -9,6 +9,7 @@ interface Props {
   products: Product[];
   activeIndex: number;
   onIndexChange: (index: number) => void;
+  cartProductIds?: number[];
 }
 
 // Degrees per frame (≈ 15°/sec at 60fps)
@@ -18,6 +19,7 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
   products,
   activeIndex,
   onIndexChange,
+  cartProductIds = [],
 }) => {
   const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
@@ -164,6 +166,9 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
       <div className="absolute inset-0 flex items-center justify-center">
         {products.map((product, index) => {
           const isActive = index === activeIndex;
+          const isInCart = cartProductIds.includes(product.id);
+          const isHighlighted = isActive || isInCart;
+
           return (
             <div
               key={product.id}
@@ -206,7 +211,7 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
 
                 {ITEM_SIZE > 30 && (
                   <p
-                    className="text-white font-bold truncate text-center bg-black/70 backdrop-blur-md rounded-full px-2 py-0.5 leading-tight"
+                    className={`font-bold truncate text-center bg-black/70 backdrop-blur-md rounded-full px-2 py-0.5 leading-tight transition-colors duration-300 ${isHighlighted ? 'text-green-400' : 'text-white'}`}
                     style={{
                       fontSize: Math.max(10, ITEM_SIZE * 0.18),
                       maxWidth: ITEM_SIZE + 35,
@@ -222,32 +227,6 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
         })}
       </div>
 
-      {/* Name & price below ring */}
-      <div
-        className="absolute z-30 text-center pointer-events-none"
-        style={{
-          top:       '50%',
-          left:      '50%',
-          transform: `translate(-50%, ${RING_RADIUS + 14}px)`,
-        }}
-      >
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={products[activeIndex]?.id}
-            initial={{ opacity: 0, y: 6  }}
-            animate={{ opacity: 1, y: 0  }}
-            exit={{    opacity: 0, y: -6 }}
-            transition={{ duration: 0.2 }}
-          >
-            <p className="text-sm font-black text-white drop-shadow-md whitespace-nowrap">
-              {products[activeIndex]?.name}
-            </p>
-            <p className="text-xs font-bold text-pink-400">
-              {products[activeIndex]?.price} ر.س
-            </p>
-          </motion.div>
-        </AnimatePresence>
-      </div>
     </motion.div>
   );
 });

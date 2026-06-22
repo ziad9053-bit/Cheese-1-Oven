@@ -125,6 +125,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
           products={products}
           activeIndex={activeIndex}
           onIndexChange={setActiveIndex}
+          cartProductIds={cartItems.map(item => item.product.id)}
         />
       </div>
 
