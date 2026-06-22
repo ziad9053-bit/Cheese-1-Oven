@@ -145,7 +145,7 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
 
   return (
     <motion.div
-      className="relative w-full h-full flex items-center justify-center touch-none pointer-events-auto select-none"
+      className="relative w-full h-full flex items-center justify-center touch-none pointer-events-auto select-none translate-y-6 md:translate-y-10"
       onPanStart={onPanStart}
       onPanEnd={onPanEnd}
     >

@@ -71,8 +71,10 @@ export const ProductScene: React.FC<Props> = ({
       </AnimatePresence>
       <div className="absolute inset-0 bg-black/40 z-0" />
 
-      {/* Central pizza image — animates only when product changes */}
-      <div className="relative z-40 w-full h-full flex items-center justify-center pointer-events-none">
+      {/* Scene Wrapper for shifting down */}
+      <div className="absolute inset-0 pointer-events-none translate-y-6 md:translate-y-10">
+        {/* Central pizza image — animates only when product changes */}
+        <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
         <AnimatePresence mode="popLayout">
           <motion.img
             key={product?.id}
@@ -174,6 +176,7 @@ export const ProductScene: React.FC<Props> = ({
           </AnimatePresence>
         </div>
       )}
+      </div>
     </div>
   );
 };
