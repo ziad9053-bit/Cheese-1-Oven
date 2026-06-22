@@ -104,8 +104,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         v2.0
       </div>
       
-      {/* Layer 1 (z-10): Background + pizza image — pointer-events-auto so sauce/add buttons work */}
-      <div className="absolute inset-0 z-10 pointer-events-auto">
+      {/* Layer 1 (z-30): Central product scene - must be above carousel so Add button is clickable */}
+      <div className="absolute inset-0 z-30 pointer-events-none">
         {activeProduct ? (
           <ProductScene 
             product={activeProduct}
@@ -116,13 +116,13 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
             onAddClick={handleAddProduct}
           />
         ) : (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center h-full pointer-events-auto">
             <p>لا توجد منتجات حالياً</p>
           </div>
         )}
       </div>
 
-      {/* Layer 2 (z-20): Carousel ring — pointer-events-none on wrapper; KineticCarousel handles its own internally */}
+      {/* Layer 2 (z-20): Carousel ring */}
       <div className="absolute inset-0 z-20 pointer-events-none">
         <KineticCarousel 
           products={products}
