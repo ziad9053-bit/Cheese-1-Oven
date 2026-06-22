@@ -40,7 +40,7 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
   /* ─── geometry ───────────────────────────────────────────────────── */
   const count        = products.length;
   const safeMobile   = mounted ? isMobile : false;
-  const RING_RADIUS  = safeMobile ? 140 : 240;
+  const RING_RADIUS  = safeMobile ? 160 : 280;
   const STEP         = count > 0 ? 360 / count : 0;
   const arc          = 2 * Math.PI * RING_RADIUS;
   const raw          = count > 0 ? (arc / count) * 0.95 : 90;
