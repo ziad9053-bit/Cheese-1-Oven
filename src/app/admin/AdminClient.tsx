@@ -32,7 +32,7 @@ async function serverUpload(blob: Blob, path: string): Promise<string | null> {
 }
 
 // ── WebP converter (client-side) ───────────────────────────────────────────────
-async function toWebP(file: File, maxW: number, maxH: number, q: number): Promise<{ blob: Blob; url: string; origSize: number; newSize: number }> {
+async function toWebP(file: File, maxW: number, maxH: number, q: number, checkTrans = false): Promise<{ blob: Blob; url: string; origSize: number; newSize: number }> {
   return new Promise((resolve, reject) => {
     const img = new window.Image();
     const reader = new FileReader();
@@ -45,7 +45,20 @@ async function toWebP(file: File, maxW: number, maxH: number, q: number): Promis
         height = Math.round(height * ratio);
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
-        canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        if (checkTrans) {
+          const tl = ctx.getImageData(0, 0, 1, 1).data[3];
+          const tr = ctx.getImageData(width - 1, 0, 1, 1).data[3];
+          const bl = ctx.getImageData(0, height - 1, 1, 1).data[3];
+          const br = ctx.getImageData(width - 1, height - 1, 1, 1).data[3];
+          // If all 4 corners are fully opaque (alpha >= 250), it's highly likely a solid background.
+          if (tl > 250 && tr > 250 && bl > 250 && br > 250) {
+            return reject(new Error('SOLID_BG'));
+          }
+        }
+
         canvas.toBlob(blob => {
           if (!blob) return reject(new Error('Failed'));
           resolve({ blob, url: URL.createObjectURL(blob), origSize: file.size, newSize: blob.size });
@@ -70,7 +83,7 @@ function Toast({ msg, type, onClose }: { msg: string; type: 'ok'|'err'; onClose:
 }
 
 // ── Image Processor ────────────────────────────────────────────────────────────
-function ImageProcessor({ onUse }: { onUse?: (blob: Blob, previewUrl: string) => void }) {
+function ImageProcessor({ onUse, checkTrans = false }: { onUse?: (blob: Blob, previewUrl: string) => void; checkTrans?: boolean }) {
   const [maxW, setMaxW]     = useState(800);
   const [maxH, setMaxH]     = useState(800);
   const [quality, setQuality] = useState(88);
@@ -86,8 +99,12 @@ function ImageProcessor({ onUse }: { onUse?: (blob: Blob, previewUrl: string) =>
     setResult(null);
     setLoading(true);
     try {
-      const r = await toWebP(f, maxW, maxH, quality);
+      const r = await toWebP(f, maxW, maxH, quality, checkTrans);
       setResult({ blob: r.blob, url: r.url, size: r.newSize });
+    } catch (e: any) {
+      if (e.message === 'SOLID_BG') {
+        alert('❌ عذراً! يجب أن تكون الصورة مفرغة (بدون خلفية) لكي لا تُغطي على الشاشة في الواجهة ثلاثية الأبعاد. يرجى تفريغها وإعادة رفعها.');
+      }
     } finally { setLoading(false); }
   };
 
@@ -154,10 +171,11 @@ function ImageProcessor({ onUse }: { onUse?: (blob: Blob, previewUrl: string) =>
 }
 
 // ── Product Form ───────────────────────────────────────────────────────────────
-function ProductForm({ initial, categories, onSave, onCancel }: {
+function ProductForm({ initial, categories, onSave, onCancel, onToast }: {
   initial?: Product; categories: Category[];
   onSave: (p: Partial<Product>, blob?: Blob) => Promise<void>;
   onCancel: () => void;
+  onToast: (msg: string, type: 'ok'|'err') => void;
 }) {
   const [form, setForm]           = useState<Partial<Product>>(initial ?? { name: '', description: '', price: 0, image_url: '', category_id: categories[0]?.id ?? 1, product_type: 'pizza', is_available: true });
   const [imageBlob, setImageBlob] = useState<Blob | null>(null);
@@ -175,9 +193,17 @@ function ProductForm({ initial, categories, onSave, onCancel }: {
   };
 
   const handleDirectFileUpload = async (f: File) => {
-    const r = await toWebP(f, 800, 800, 88);
-    setImageBlob(r.blob);
-    setPreview(r.url);
+    try {
+      const r = await toWebP(f, 800, 800, 88, true); // force transparency check for products!
+      setImageBlob(r.blob);
+      setPreview(r.url);
+    } catch (e: any) {
+      if (e.message === 'SOLID_BG') {
+        onToast('❌ توقف! يجب رفع صورة "مُفرّغة" (بدون خلفية بيضاء) لكي لا تُغطي على الديكور والألوان!', 'err');
+      } else {
+        onToast('حدث خطأ أثناء معالجة الصورة', 'err');
+      }
+    }
   };
 
   return (
@@ -252,7 +278,7 @@ function ProductForm({ initial, categories, onSave, onCancel }: {
               className="w-full flex items-center justify-center gap-2 text-xs text-pink-400 hover:text-pink-300 border border-pink-500/20 rounded-xl py-2 transition-colors">
               <ImagePlus size={13}/> {showProc ? 'إخفاء معالج الصور المتقدم' : 'فتح معالج الصور (تحكم متقدم)'}
             </button>
-            {showProc && <ImageProcessor onUse={handleProcessorDone}/>}
+            {showProc && <ImageProcessor onUse={handleProcessorDone} checkTrans={true} />}
           </div>
         )}
 
@@ -650,6 +676,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
               categories={categories}
               onSave={saveProduct}
               onCancel={() => { setAddProduct(false); setEditProduct(null); }}
+              onToast={showToast}
             />
           </div>
         </div>
