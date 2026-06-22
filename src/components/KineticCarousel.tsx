@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { Product } from '@/lib/data';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -15,67 +15,86 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
   const [mounted, setMounted] = useState(false);
   const isMobile = useIsMobile();
 
-  // Raw rotation angle (continuous, not reset on each step)
-  const rotDeg = useRef(0);
-  const targetRotDeg = useRef(0);
-  const rafRef = useRef<number | null>(null);
-  const wheelRef = useRef<HTMLDivElement>(null);
+  // Direct DOM refs — no React state needed for animation (zero re-renders during spin)
+  const itemRefs  = useRef<(HTMLDivElement | null)[]>([]);
+  const currentAng = useRef(0);   // current visual angle
+  const targetAng  = useRef(0);   // desired snapped angle
+  const rafId      = useRef<number | null>(null);
+  const activeRef  = useRef(activeIndex);
 
-  // Auto-rotation timer
-  const autoRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoRef  = useRef<ReturnType<typeof setInterval> | null>(null);
   const isPanning = useRef(false);
 
   useEffect(() => { setMounted(true); }, []);
+  useEffect(() => { activeRef.current = activeIndex; }, [activeIndex]);
 
   const count = products.length;
   const safeIsMobile = mounted ? isMobile : false;
 
   // ── Geometry ──────────────────────────────────────────────────────────────
-  const RING_RADIUS = safeIsMobile ? 130 : 160;
-  const STEP_ANGLE = count > 0 ? 360 / count : 0;
+  const RING_RADIUS = safeIsMobile ? 125 : 150;
+  // Closed ring: divide 360° equally among all pizzas
+  const STEP = count > 0 ? 360 / count : 0;
 
-  const circumference = 2 * Math.PI * RING_RADIUS;
-  const maxItemSize = safeIsMobile ? 58 : 76;
-  const minItemSize = 28;
-  const rawItemSize = count > 0 ? (circumference / count) * 0.82 : maxItemSize;
-  const ITEM_SIZE = Math.min(maxItemSize, Math.max(minItemSize, rawItemSize));
-
+  // Dynamic item size: fit within the arc length assigned to each item
+  const arc = 2 * Math.PI * RING_RADIUS;
+  const RAW  = count > 0 ? (arc / count) * 0.80 : 72;
+  const MAX  = safeIsMobile ? 54 : 70;
+  const MIN  = 26;
+  const ITEM_SIZE   = Math.min(MAX, Math.max(MIN, RAW));
   const CENTER_SIZE = RING_RADIUS * 2;
 
-  // ── Smooth animation loop ─────────────────────────────────────────────────
-  const tick = useCallback(() => {
-    const diff = targetRotDeg.current - rotDeg.current;
-    // Lerp towards target at 12% per frame — smooth & consistent
-    if (Math.abs(diff) > 0.05) {
-      rotDeg.current += diff * 0.12;
-    } else {
-      rotDeg.current = targetRotDeg.current;
+  // ── Direct-DOM position updater (called every rAF tick) ─────────────────
+  const pushPositions = useCallback(() => {
+    const a = currentAng.current;
+    for (let i = 0; i < itemRefs.current.length; i++) {
+      const el = itemRefs.current[i];
+      if (!el) continue;
+      const deg = a + i * STEP;
+      const rad = (deg * Math.PI) / 180;
+      const x   = Math.sin(rad) * RING_RADIUS;
+      const y   = -Math.cos(rad) * RING_RADIUS;
+      // translate relative to center; item is absolute top:50% left:50%
+      el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
     }
-    if (wheelRef.current) {
-      wheelRef.current.style.transform = `translate(-50%,-50%) rotate(${rotDeg.current}deg)`;
-    }
-    rafRef.current = requestAnimationFrame(tick);
-  }, []);
+  }, [STEP, RING_RADIUS]);
 
-  useEffect(() => {
-    rafRef.current = requestAnimationFrame(tick);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [tick]);
-
-  // ── Snap wheel when activeIndex changes ───────────────────────────────────
+  // ── rAF animation loop ───────────────────────────────────────────────────
   useEffect(() => {
     if (!mounted) return;
-    // Find shortest path to new target (handles wrapping)
-    const rawTarget = -activeIndex * STEP_ANGLE;
-    // Adjust so we always rotate the shortest arc
-    let delta = rawTarget - targetRotDeg.current;
-    // Normalize delta to [-180, 180]
-    delta = ((delta + 180) % 360) - 180;
-    if (delta < -180) delta += 360;
-    targetRotDeg.current = targetRotDeg.current + delta;
-  }, [activeIndex, STEP_ANGLE, mounted]);
 
-  // ── Auto-rotation ─────────────────────────────────────────────────────────
+    const tick = () => {
+      let diff = targetAng.current - currentAng.current;
+      // Shortest-arc normalisation → always take the < 180° path
+      diff = ((diff % 360) + 360) % 360;
+      if (diff > 180) diff -= 360;
+
+      if (Math.abs(diff) > 0.02) {
+        currentAng.current += diff * 0.11; // lerp 11% per frame → silky 60fps
+      } else {
+        currentAng.current = targetAng.current;
+      }
+
+      pushPositions();
+      rafId.current = requestAnimationFrame(tick);
+    };
+
+    rafId.current = requestAnimationFrame(tick);
+    return () => { if (rafId.current) cancelAnimationFrame(rafId.current); };
+  }, [mounted, pushPositions]);
+
+  // ── Snap target whenever activeIndex changes ─────────────────────────────
+  useEffect(() => {
+    if (!mounted || STEP === 0) return;
+    const raw = -activeIndex * STEP;
+    // Shortest delta from current target
+    let delta = raw - targetAng.current;
+    delta = ((delta % 360) + 360) % 360;
+    if (delta > 180) delta -= 360;
+    targetAng.current += delta;
+  }, [activeIndex, STEP, mounted]);
+
+  // ── Auto-rotation (restarts only once per activeIndex change) ────────────
   const stopAuto = useCallback(() => {
     if (autoRef.current) { clearInterval(autoRef.current); autoRef.current = null; }
   }, []);
@@ -84,39 +103,35 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
     stopAuto();
     autoRef.current = setInterval(() => {
       if (!isPanning.current) {
-        onIndexChange((activeIndex + 1) % count);
+        onIndexChange((activeRef.current + 1) % count);
       }
     }, 3000);
-  }, [activeIndex, count, onIndexChange, stopAuto]);
+  }, [count, onIndexChange, stopAuto]);
 
+  // Start auto only once on mount; activeIndex changes tracked via ref
   useEffect(() => {
     if (!mounted || count === 0) return;
     startAuto();
     return stopAuto;
-  }, [mounted, activeIndex, count, startAuto, stopAuto]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, count]);
 
-  // ── Swipe / Pan ───────────────────────────────────────────────────────────
+  // ── Pan / Swipe ───────────────────────────────────────────────────────────
   const handlePanStart = useCallback(() => {
     isPanning.current = true;
     stopAuto();
   }, [stopAuto]);
 
-  const handlePanEnd = useCallback(
-    (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-      isPanning.current = false;
-      const { offset, velocity } = info;
-      let newIndex = activeIndex;
-      if (offset.x > 40 || velocity.x > 400) {
-        newIndex = (activeIndex + 1) % count;
-      } else if (offset.x < -40 || velocity.x < -400) {
-        newIndex = (activeIndex - 1 + count) % count;
-      }
-      onIndexChange(newIndex);
-      // Resume auto after 4s idle
-      setTimeout(() => startAuto(), 4000);
-    },
-    [activeIndex, count, onIndexChange, startAuto]
-  );
+  const handlePanEnd = useCallback((_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    isPanning.current = false;
+    const ai = activeRef.current;
+    let next = ai;
+    if (info.offset.x > 40  || info.velocity.x > 400) next = (ai + 1) % count;
+    if (info.offset.x < -40 || info.velocity.x < -400) next = (ai - 1 + count) % count;
+    onIndexChange(next);
+    // Resume auto after 4 s idle
+    setTimeout(startAuto, 4000);
+  }, [count, onIndexChange, startAuto]);
 
   if (!mounted || count === 0) return null;
 
@@ -126,126 +141,114 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
       onPanStart={handlePanStart}
       onPanEnd={handlePanEnd}
     >
-      {/* Decorative ring border */}
+      {/* ── Decorative ring ──────────────────────────────────────────── */}
       <div
-        className="absolute rounded-full border border-white/15 pointer-events-none"
+        className="absolute rounded-full border border-white/10 pointer-events-none"
         style={{
-          width: RING_RADIUS * 2,
+          width:  RING_RADIUS * 2,
           height: RING_RADIUS * 2,
-          boxShadow: '0 0 60px rgba(236,72,153,0.12), inset 0 0 60px rgba(0,0,0,0.3)',
+          boxShadow: '0 0 50px rgba(236,72,153,0.08), inset 0 0 50px rgba(0,0,0,0.25)',
         }}
       />
 
-      {/* Spinning wheel of thumbnails */}
-      <div
-        ref={wheelRef}
-        className="absolute"
-        style={{
-          top: '50%',
-          left: '50%',
-          width: RING_RADIUS * 2,
-          height: RING_RADIUS * 2,
-          transform: 'translate(-50%,-50%) rotate(0deg)',
-          willChange: 'transform',
-        }}
-      >
+      {/* ── Pizza thumbnails (position driven purely by rAF → zero React renders) */}
+      <div className="absolute inset-0 flex items-center justify-center">
         {products.map((product, index) => {
-          const angleDeg = index * STEP_ANGLE;
-          const angleRad = (angleDeg * Math.PI) / 180;
-          const cx = RING_RADIUS + Math.sin(angleRad) * RING_RADIUS;
-          const cy = RING_RADIUS - Math.cos(angleRad) * RING_RADIUS;
           const isActive = index === activeIndex;
-
           return (
             <div
               key={product.id}
+              ref={(el) => { itemRefs.current[index] = el; }}
               className="absolute"
-              style={{ left: cx, top: cy, transform: 'translate(-50%,-50%)' }}
+              style={{ top: '50%', left: '50%' }}
             >
-              <motion.div
-                animate={{
-                  scale: isActive ? 0.01 : 1,
-                  opacity: isActive ? 0 : 0.8,
-                }}
-                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              <div
                 onClick={(e) => {
                   e.stopPropagation();
                   stopAuto();
                   onIndexChange(index);
+                  // Resume auto after 4 s
+                  setTimeout(startAuto, 4000);
                 }}
-                className="cursor-pointer flex flex-col items-center gap-1"
-                whileHover={{ scale: isActive ? 0 : 1.2, opacity: isActive ? 0 : 1 }}
-                whileTap={{ scale: 0.9 }}
+                className="flex flex-col items-center gap-1 cursor-pointer select-none"
+                style={{
+                  opacity:       isActive ? 0 : 0.85,
+                  transform:     isActive ? 'scale(0.01)' : 'scale(1)',
+                  transition:    'opacity 0.28s ease, transform 0.28s ease',
+                  pointerEvents: isActive ? 'none' : 'auto',
+                }}
               >
                 <div
-                  className="rounded-full overflow-hidden border-2 border-white/30 shadow-xl ring-2 ring-transparent hover:ring-pink-500/50 transition-all"
+                  className="rounded-full overflow-hidden border-2 border-white/30 shadow-xl transition-shadow hover:border-pink-400 hover:shadow-pink-500/40"
                   style={{ width: ITEM_SIZE, height: ITEM_SIZE }}
                 >
-                  {product.image_url ? (
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                      draggable={false}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-800 flex items-center justify-center text-[10px]">🍕</div>
-                  )}
+                  {product.image_url
+                    ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" draggable={false} />
+                    : <div className="w-full h-full bg-gray-800 flex items-center justify-center text-[10px]">🍕</div>
+                  }
                 </div>
                 {ITEM_SIZE > 42 && (
                   <p
-                    className="text-white font-semibold truncate text-center leading-tight bg-black/60 backdrop-blur-sm rounded-full px-1.5 py-0.5"
-                    style={{ fontSize: Math.max(8, ITEM_SIZE * 0.16), maxWidth: ITEM_SIZE + 20 }}
+                    className="text-white font-semibold truncate text-center bg-black/60 backdrop-blur-sm rounded-full px-1.5 py-0.5 leading-tight"
+                    style={{ fontSize: Math.max(8, ITEM_SIZE * 0.15), maxWidth: ITEM_SIZE + 18 }}
                   >
                     {product.name}
                   </p>
                 )}
-              </motion.div>
+              </div>
             </div>
           );
         })}
       </div>
 
-      {/* Active pizza in center – sized to fill the ring diameter */}
+      {/* ── Central active pizza — jumps to center on selection ──────── */}
       <div
         className="absolute z-20 pointer-events-none"
         style={{ width: CENTER_SIZE, height: CENTER_SIZE }}
       >
-        {products[activeIndex]?.image_url && (
-          <motion.img
-            key={products[activeIndex].id}
-            src={products[activeIndex].image_url}
-            alt={products[activeIndex].name}
-            className="w-full h-full object-contain rounded-full drop-shadow-2xl"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-            draggable={false}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {products[activeIndex]?.image_url && (
+            <motion.img
+              key={products[activeIndex].id}
+              src={products[activeIndex].image_url}
+              alt={products[activeIndex].name}
+              className="w-full h-full object-contain rounded-full"
+              style={{ filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.85))' }}
+              initial={{ scale: 0.3, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.25, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+              draggable={false}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Name & price below ring */}
+      {/* ── Name & price below ring ───────────────────────────────────── */}
       <div
         className="absolute z-30 text-center pointer-events-none"
-        style={{ top: '50%', left: '50%', transform: `translate(-50%, ${RING_RADIUS + 10}px)` }}
+        style={{
+          top:  '50%',
+          left: '50%',
+          transform: `translate(-50%, ${RING_RADIUS + 14}px)`,
+        }}
       >
-        <motion.p
-          key={products[activeIndex]?.name}
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-sm font-black text-white drop-shadow-md whitespace-nowrap"
-        >
-          {products[activeIndex]?.name}
-        </motion.p>
-        <motion.p
-          key={products[activeIndex]?.price}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-xs font-bold text-pink-400"
-        >
-          {products[activeIndex]?.price} ر.س
-        </motion.p>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={products[activeIndex]?.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            <p className="text-sm font-black text-white drop-shadow-md whitespace-nowrap">
+              {products[activeIndex]?.name}
+            </p>
+            <p className="text-xs font-bold text-pink-400">
+              {products[activeIndex]?.price} ر.س
+            </p>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </motion.div>
   );
