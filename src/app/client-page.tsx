@@ -58,7 +58,6 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
     
     setCartItems([...cartItems, newItem]);
     setSelectedSauceIds([]);
-    setIsSheetOpen(true);
   };
 
   const handleUpdateQuantity = (id: string, delta: number) => {
