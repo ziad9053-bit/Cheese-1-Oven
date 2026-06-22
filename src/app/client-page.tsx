@@ -101,8 +101,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         v2.0
       </div>
       
-      {/* Layer 1 (z-10): Background + central pizza image */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
+      {/* Layer 1 (z-10): Background + pizza image — pointer-events-auto so sauce/add buttons work */}
+      <div className="absolute inset-0 z-10 pointer-events-auto">
         {activeProduct ? (
           <ProductScene 
             product={activeProduct}
@@ -119,7 +119,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         )}
       </div>
 
-      {/* Layer 2 (z-20): Circular thumbnail ring — clickable pizza circles */}
+      {/* Layer 2 (z-20): Carousel ring — pointer-events-none on wrapper; KineticCarousel handles its own internally */}
       <div className="absolute inset-0 z-20 pointer-events-none">
         <KineticCarousel 
           products={products}

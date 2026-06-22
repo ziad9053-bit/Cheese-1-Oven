@@ -563,32 +563,26 @@ export default function AdminClient({ initialProducts, initialCategories }: {
                 </button>
               </div>
 
-              {addProduct && <ProductForm categories={categories} onSave={saveProduct} onCancel={() => setAddProduct(false)}/>}
-              {editProduct && <ProductForm initial={editProduct} categories={categories} onSave={saveProduct} onCancel={() => setEditProduct(null)}/>}
-
               {products.map(p => (
                 <div key={p.id} className="bg-zinc-900 border border-white/8 rounded-2xl p-4 flex items-center gap-3 hover:border-white/15 transition-colors">
                   {p.image_url
-                    ? <img src={p.image_url} alt={p.name} className="w-14 h-14 rounded-xl object-cover shrink-0"/>
-                    : <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center shrink-0 text-2xl">🍕</div>
+                    ? <img src={p.image_url} alt={p.name} className="w-16 h-16 rounded-xl object-cover shrink-0 border border-white/10"/>
+                    : <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center shrink-0 text-2xl border border-white/8">🍕</div>
                   }
                   <div className="flex-1 min-w-0">
                     <p className="font-black text-white truncate">{p.name}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-white/40">{p.product_type}</span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${p.is_available ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
-                        {p.is_available ? 'متاح' : 'مغلق'}
-                      </span>
-                    </div>
+                    <p className="text-xs text-white/40">{p.price} ر.س · {p.product_type}</p>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full mt-1 inline-block ${p.is_available ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                      {p.is_available ? '✅ متاح' : '❌ مغلق'}
+                    </span>
                   </div>
-                  <p className="font-black text-pink-400 shrink-0 text-sm">{p.price} ر.س</p>
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex flex-col gap-2 shrink-0">
                     <button onClick={() => { setEditProduct(p); setAddProduct(false); }}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 text-xs font-bold border border-blue-500/20 transition-colors">
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-900/40 hover:bg-blue-800/60 text-blue-200 text-xs font-bold border border-blue-500/30 transition-colors w-full justify-center">
                       <Pencil size={13}/> تعديل
                     </button>
                     <button onClick={() => setConfirmDel({ type: 'product', id: p.id })}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-900/20 hover:bg-red-900/40 text-red-400 text-xs font-bold border border-red-500/10 transition-colors">
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-900/30 hover:bg-red-800/50 text-red-300 text-xs font-bold border border-red-500/20 transition-colors w-full justify-center">
                       <Trash2 size={13}/> حذف
                     </button>
                   </div>
@@ -647,7 +641,21 @@ export default function AdminClient({ initialProducts, initialCategories }: {
         </div>
       </main>
 
-      {/* ── Delete confirm ── */}
+      {/* ── Product Add/Edit Modal ─────────────────────────────────────────── */}
+      {(addProduct || editProduct) && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-start justify-center p-4 overflow-y-auto">
+          <div className="w-full max-w-xl my-8">
+            <ProductForm
+              initial={editProduct ?? undefined}
+              categories={categories}
+              onSave={saveProduct}
+              onCancel={() => { setAddProduct(false); setEditProduct(null); }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete confirm ────────────────────────────────────────────────────── */}
       {confirmDel && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
           <div className="bg-zinc-900 border border-red-500/30 rounded-2xl p-6 w-full max-w-sm space-y-4">
