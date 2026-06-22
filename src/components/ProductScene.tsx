@@ -25,11 +25,22 @@ export const ProductScene: React.FC<Props> = ({
 }) => {
   const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
+  const [loadedBg, setLoadedBg] = useState<string>(bgImageUrl || "");
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const currentBg = bgImageUrl || "";
-  
+  // Preload background before switching to prevent disappearing/blank flashes
+  useEffect(() => {
+    if (!bgImageUrl || bgImageUrl === loadedBg) return;
+    const img = new window.Image();
+    img.src = bgImageUrl;
+    img.onload = () => {
+      setLoadedBg(bgImageUrl);
+    };
+  }, [bgImageUrl, loadedBg]);
+
   const safeIsMobile = mounted ? isMobile : false;
   const pizzaRadius = safeIsMobile ? 110 : 185;
   const sauceRadius = safeIsMobile ? 80 : 130; 
@@ -44,18 +55,21 @@ export const ProductScene: React.FC<Props> = ({
 
   return (
     <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-transparent">
-      {/* Background */}
-      {currentBg && (
-        <>
-          <img 
-            src={currentBg}
-            alt="App Background"
-            className="absolute inset-0 w-full h-full object-cover"
-            data-ai-hint="pizza oven neon sign"
-          />
-          <div className="absolute inset-0 bg-black/40" />
-        </>
-      )}
+      {/* Background with crossfade */}
+      <AnimatePresence mode="popLayout">
+        <motion.img 
+          key={loadedBg}
+          src={loadedBg}
+          alt="App Background"
+          className="absolute inset-0 w-full h-full object-cover"
+          data-ai-hint="pizza oven neon sign"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+        />
+      </AnimatePresence>
+      <div className="absolute inset-0 bg-black/40 z-0" />
 
       {/* Central pizza image — animates only when product changes */}
       <div className="relative z-40 w-full h-full flex items-center justify-center pointer-events-none">
