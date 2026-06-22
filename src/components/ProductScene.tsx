@@ -48,7 +48,7 @@ export const ProductScene: React.FC<Props> = ({
   const startAngle = 180;
   const endAngle = 360;
 
-  const actionAngle = 0;
+  const actionAngle = 90;
   const actionAngleRad = (actionAngle * Math.PI) / 180;
   const actionX = Math.cos(actionAngleRad) * pizzaRadius;
   const actionY = Math.sin(actionAngleRad) * pizzaRadius;
@@ -90,6 +90,30 @@ export const ProductScene: React.FC<Props> = ({
 
         {/* Shadow under pizza */}
         <div className="absolute bottom-[calc(50%-20px)] left-1/2 -translate-x-1/2 w-[200px] md:w-[320px] h-[20px] bg-black/80 blur-[25px] rounded-full" />
+        
+        {/* Animated Name Overlay */}
+        <AnimatePresence>
+          {mounted && product && (
+            <motion.div
+              key={`name-anim-${product.id}`}
+              className="absolute z-50 pointer-events-none flex items-center justify-center"
+              initial={{ scale: 1.5, opacity: 0 }}
+              animate={{ 
+                scale: [1.5, 1, 0], 
+                opacity: [0, 1, 0],
+              }}
+              transition={{ 
+                duration: 1.8, 
+                times: [0, 0.2, 1],
+                ease: "easeInOut"
+              }}
+            >
+              <h2 className="text-4xl md:text-6xl font-black text-white drop-shadow-[0_0_20px_rgba(236,72,153,1)] text-center px-4 leading-tight">
+                {product.name}
+              </h2>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ── Sauce orbits — OUTSIDE AnimatePresence so they never flicker ── */}
@@ -157,9 +181,9 @@ export const ProductScene: React.FC<Props> = ({
               e.stopPropagation();
               onAddClick();
             }}
-            className="w-6 h-6 md:w-8 md:h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(236,72,153,0.7)] border border-white/30 neon-glow-pink cursor-pointer"
+            className="w-10 h-10 md:w-12 md:h-12 bg-green-500 text-white rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(34,197,94,0.8)] border-2 border-white neon-glow-pink cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5 md:w-5 md:h-5 stroke-[4px]" />
+            <Plus className="w-5 h-5 md:w-6 md:h-6 stroke-[4px]" />
           </motion.button>
           
           <AnimatePresence mode="wait">
@@ -169,9 +193,9 @@ export const ProductScene: React.FC<Props> = ({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -4, opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="bg-black/80 backdrop-blur-xl px-2.5 py-1 rounded-full border border-white/20 shadow-2xl"
+              className="bg-black/90 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/30 shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
             >
-              <span className="text-[10px] md:text-xs font-black text-primary whitespace-nowrap">{product.price} ر.س</span>
+              <span className="text-sm md:text-base font-black text-green-400 whitespace-nowrap">{product.price} ر.س</span>
             </motion.div>
           </AnimatePresence>
         </div>
