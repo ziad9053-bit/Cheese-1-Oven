@@ -5,6 +5,7 @@ import { Product, Sauce, Drink } from '@/lib/data';
 import { ProductScene } from '@/components/ProductScene';
 import { KineticCarousel } from '@/components/KineticCarousel';
 import { OrderingBottomSheet } from '@/components/OrderingBottomSheet';
+import { ShoppingCart } from 'lucide-react';
 
 interface Props {
   products: Product[];
@@ -22,6 +23,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
 
   const activeProduct = products[activeIndex];
   const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pastry.jpg';
+
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0) + drinkItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleAddSauce = (sauce: Sauce) => {
     if (selectedSauceIds.includes(sauce.id)) {
@@ -128,6 +131,19 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
           cartProductIds={cartItems.map(item => item.product.id)}
         />
       </div>
+
+      {/* Floating Cart Button */}
+      <button
+        onClick={() => setIsSheetOpen(true)}
+        className="absolute bottom-6 left-6 md:bottom-10 md:left-10 z-[60] bg-green-500 text-white p-3.5 md:p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.6)] hover:scale-110 active:scale-95 transition-transform flex items-center justify-center border-2 border-white cursor-pointer"
+      >
+        <ShoppingCart className="w-6 h-6 md:w-7 md:h-7" />
+        {totalItems > 0 && (
+          <div className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs md:text-sm font-black w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-full border-2 border-black drop-shadow-md">
+            {totalItems}
+          </div>
+        )}
+      </button>
 
       <OrderingBottomSheet 
         isOpen={isSheetOpen}
