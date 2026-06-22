@@ -114,13 +114,8 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
       } else if (!isPanning.current) {
         /* ── AUTO-SPIN: time-based constant speed ── */
         ringAngle.current += (SPIN_SPEED_PER_SEC * dt) / 1000;
-
-        /* Update active index from geometry (no effect on rotation) */
-        const ni = nearestIndex();
-        if (ni !== activeRef.current) {
-          activeRef.current = ni;
-          onIndexChange(ni); // tell parent
-        }
+        // Notice: We removed the automatic nearestIndex() update here.
+        // The central pizza will now ONLY change when the user explicitly clicks a thumbnail or swipes.
       }
 
       pushPositions();
