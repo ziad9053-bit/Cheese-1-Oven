@@ -88,9 +88,20 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   return (
     <main className="fixed inset-0 overflow-hidden bg-black text-white flex flex-col">
       <div className="absolute top-4 right-4 z-50 text-xs text-white/50 bg-black/50 px-2 py-1 rounded-full pointer-events-none">
-        v1.2 (عجلة دائرية)
+        v1.3 (المركز الدائري)
       </div>
-      <div className="flex-1 relative">
+      
+      {/* Full Screen Circular Dial Overlay (Background) */}
+      <div className="absolute inset-0 z-0 pointer-events-auto">
+        <KineticCarousel 
+          products={products}
+          activeIndex={activeIndex}
+          onIndexChange={setActiveIndex}
+        />
+      </div>
+
+      {/* Foreground: Central Pizza and Buttons */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
         {activeProduct ? (
           <ProductScene 
             product={activeProduct}
@@ -105,14 +116,6 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
             <p>لا توجد منتجات حالياً</p>
           </div>
         )}
-      </div>
-
-      <div className="shrink-0 z-40">
-        <KineticCarousel 
-          products={products}
-          activeIndex={activeIndex}
-          onIndexChange={setActiveIndex}
-        />
       </div>
 
       <OrderingBottomSheet 

@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useAnimation, PanInfo } from 'framer-motion';
 import { Product } from '@/lib/data';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Props {
   products: Product[];
@@ -14,6 +15,7 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
   const containerRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setMounted(true);
@@ -50,27 +52,24 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
 
   if (!mounted || products.length === 0) return null;
 
-  const radius = 280;
+  const safeIsMobile = mounted ? isMobile : false;
+  const radius = safeIsMobile ? 180 : 350; // Responsive radius to fit screen width
   const stepAngle = 25;
 
   return (
     <motion.div 
       onPanEnd={handlePanEnd}
-      className="relative w-full h-[180px] overflow-hidden flex items-center justify-center bg-black/40 backdrop-blur-md border-t border-white/10 touch-none"
+      className="relative w-full h-full overflow-hidden flex items-center justify-center pointer-events-auto touch-none"
     >
-      <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[120px] bg-gradient-to-b from-primary/20 to-transparent pointer-events-none z-0" />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-8 bg-primary/30 blur-2xl rounded-full" />
-
-      {/* The invisible spinning wheel */}
+      {/* The invisible spinning wheel centered on screen */}
       <motion.div
         animate={controls}
-        className="absolute"
+        className="absolute top-1/2 left-1/2"
         style={{
           width: radius * 2,
           height: radius * 2,
-          bottom: -(radius * 2) + 120, // centers the active item nicely
-          left: '50%',
           x: '-50%',
+          y: '-50%',
           borderRadius: '50%',
           zIndex: 10,
         }}
@@ -92,13 +91,13 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
                   animate={{
                     // Counter rotate so text and pizza stay upright!
                     rotate: -itemAngle - (activeIndex * stepAngle),
-                    scale: isActive ? 1.15 : 0.75,
-                    opacity: isActive ? 1 : 0.4,
+                    scale: isActive ? 0 : 0.85, // Hide active from ring since it's in the center
+                    opacity: isActive ? 0 : 0.6,
                   }}
                   transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                   onClick={() => onIndexChange(index)}
                 >
-                  <div className={`w-[80px] h-[80px] rounded-full overflow-hidden shadow-2xl border-2 transition-colors duration-300 ${isActive ? 'border-primary ring-4 ring-primary/40' : 'border-white/10'}`}>
+                  <div className="w-[90px] h-[90px] rounded-full overflow-hidden shadow-2xl border-2 border-white/20 transition-colors duration-300">
                     {product.image_url ? (
                       <img
                         src={product.image_url}
@@ -111,12 +110,9 @@ export const KineticCarousel: React.FC<Props> = ({ products, activeIndex, onInde
                     )}
                   </div>
                   
-                  <div className={`mt-3 text-center w-28 transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-                    <p className="text-sm font-bold text-white truncate drop-shadow-md">
+                  <div className="mt-2 text-center w-28 bg-black/50 backdrop-blur-sm rounded-lg py-1 px-2 border border-white/10">
+                    <p className="text-[11px] font-bold text-white truncate drop-shadow-md">
                       {product.name}
-                    </p>
-                    <p className="text-xs font-black text-primary drop-shadow-md">
-                      {product.price} ر.س
                     </p>
                   </div>
                 </motion.div>
