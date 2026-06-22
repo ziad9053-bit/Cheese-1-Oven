@@ -32,10 +32,10 @@ export const ProductScene: React.FC<Props> = ({
   
   const safeIsMobile = mounted ? isMobile : false;
   const pizzaRadius = safeIsMobile ? 110 : 185;
-  const sauceRadius = safeIsMobile ? 90 : 160; 
+  const sauceRadius = safeIsMobile ? 80 : 130; 
   
-  const startAngle = 140;
-  const endAngle = 220;
+  const startAngle = 180;
+  const endAngle = 360;
 
   const actionAngle = 0;
   const actionAngleRad = (actionAngle * Math.PI) / 180;
@@ -64,7 +64,7 @@ export const ProductScene: React.FC<Props> = ({
             key={product?.id}
             src={product?.image_url || ''}
             alt={product?.name || ''}
-            className="w-[220px] h-[220px] md:w-[370px] md:h-[370px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] rounded-full"
+            className="w-[200px] h-[200px] md:w-[320px] md:h-[320px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] rounded-full"
             initial={{ scale: 0.2, opacity: 0, rotate: -30 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 1.4, opacity: 0, rotate: 15 }}

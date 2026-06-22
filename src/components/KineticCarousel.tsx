@@ -11,10 +11,10 @@ interface Props {
   onIndexChange: (index: number) => void;
 }
 
-// Degrees per rAF frame (≈60 fps) → ~0.25°/frame = ~15°/sec
-const SPIN_SPEED = 0.25;
+// Degrees per second (≈ 15°/sec)
+const SPIN_SPEED_PER_SEC = 15;
 
-export const KineticCarousel: React.FC<Props> = ({
+export const KineticCarousel: React.FC<Props> = React.memo(({
   products,
   activeIndex,
   onIndexChange,
@@ -40,7 +40,7 @@ export const KineticCarousel: React.FC<Props> = ({
   /* ─── geometry ───────────────────────────────────────────────────── */
   const count        = products.length;
   const safeMobile   = mounted ? isMobile : false;
-  const RING_RADIUS  = safeMobile ? 125 : 150;
+  const RING_RADIUS  = safeMobile ? 140 : 240;
   const STEP         = count > 0 ? 360 / count : 0;
   const arc          = 2 * Math.PI * RING_RADIUS;
   const raw          = count > 0 ? (arc / count) * 0.80 : 72;
@@ -95,7 +95,12 @@ export const KineticCarousel: React.FC<Props> = ({
   useEffect(() => {
     if (!mounted) return;
 
-    const tick = () => {
+    let lastTime = performance.now();
+
+    const tick = (now: number) => {
+      const dt = now - lastTime;
+      lastTime = now;
+
       if (targetAngle.current !== null) {
         /* ── SNAP MODE: lerp towards target ── */
         const diff = targetAngle.current - ringAngle.current;
@@ -103,11 +108,12 @@ export const KineticCarousel: React.FC<Props> = ({
           ringAngle.current   = targetAngle.current;
           targetAngle.current = null; // done snapping → resume auto-spin
         } else {
-          ringAngle.current += diff * 0.13; // smooth ease-out
+          // Time-adjusted lerp (approximate)
+          ringAngle.current += diff * (1 - Math.exp(-dt * 0.01));
         }
       } else if (!isPanning.current) {
-        /* ── AUTO-SPIN: constant speed ── */
-        ringAngle.current += SPIN_SPEED;
+        /* ── AUTO-SPIN: time-based constant speed ── */
+        ringAngle.current += (SPIN_SPEED_PER_SEC * dt) / 1000;
 
         /* Update active index from geometry (no effect on rotation) */
         const ni = nearestIndex();
@@ -256,4 +262,6 @@ export const KineticCarousel: React.FC<Props> = ({
       </div>
     </motion.div>
   );
-};
+});
+
+KineticCarousel.displayName = 'KineticCarousel';
