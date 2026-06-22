@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Product, Sauce, Drink } from '@/lib/data';
 import { ProductScene } from '@/components/ProductScene';
 import { KineticCarousel } from '@/components/KineticCarousel';
@@ -23,6 +24,17 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
 
   const activeProduct = products[activeIndex];
   const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pastry.jpg';
+
+  const [loadedBg, setLoadedBg] = useState<string>(bgImageUrl);
+
+  useEffect(() => {
+    if (!bgImageUrl || bgImageUrl === loadedBg) return;
+    const img = new window.Image();
+    img.src = bgImageUrl;
+    img.onload = () => {
+      setLoadedBg(bgImageUrl);
+    };
+  }, [bgImageUrl, loadedBg]);
 
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0) + drinkItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -102,6 +114,22 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       {/* Version badge — top right */}
       <div className="absolute top-4 right-4 z-[100] text-[10px] text-white/25 pointer-events-none select-none">
         v2.0
+      </div>
+      {/* Layer 0 (z-0): Background Image */}
+      <div className="absolute inset-0 z-0 overflow-hidden bg-black">
+        <AnimatePresence mode="popLayout">
+          <motion.img 
+            key={loadedBg}
+            src={loadedBg}
+            alt="App Background"
+            className="absolute inset-0 w-full h-full object-cover opacity-80"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-black/40 z-0" />
       </div>
       
       {/* Layer 1 (z-30): Central product scene - must be above carousel so Add button is clickable */}

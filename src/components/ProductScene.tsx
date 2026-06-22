@@ -55,21 +55,6 @@ export const ProductScene: React.FC<Props> = ({
 
   return (
     <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-transparent">
-      {/* Background with crossfade */}
-      <AnimatePresence mode="popLayout">
-        <motion.img 
-          key={loadedBg}
-          src={loadedBg}
-          alt="App Background"
-          className="absolute inset-0 w-full h-full object-cover"
-          data-ai-hint="pizza oven neon sign"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-        />
-      </AnimatePresence>
-      <div className="absolute inset-0 bg-black/40 z-0" />
 
       {/* Scene Wrapper for shifting down */}
       <div className="absolute inset-0 pointer-events-none translate-y-6 md:translate-y-10">
