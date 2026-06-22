@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import {
   Plus, Pencil, Trash2, Upload, Check, X, Loader2,
   ImagePlus, FileImage, LayoutDashboard, Package,
-  Layers, Image, Palette, ArrowLeft,
+  Layers, Image, Palette, ArrowLeft, ArrowRight, ChevronLeft
 } from 'lucide-react';
 
 const supabase = createClient(
@@ -19,7 +19,7 @@ interface Product {
   image_url: string; category_id: number; product_type: string; is_available: boolean;
 }
 interface Category { id: number; name: string; slug: string; }
-type Section = 'dashboard' | 'products' | 'categories' | 'images';
+type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'images';
 
 // ── Server upload (bypasses RLS) ──────────────────────────────────────────────
 async function serverUpload(blob: Blob, path: string): Promise<string | null> {
@@ -430,7 +430,7 @@ function BackgroundManager({ onToast }: { onToast: (m: string, t: 'ok'|'err') =>
 export default function AdminClient({ initialProducts, initialCategories }: {
   initialProducts: Product[]; initialCategories: Category[];
 }) {
-  const [section, setSection]           = useState<Section>('dashboard');
+  const [section, setSection]           = useState<Section>('menu');
   const [products, setProducts]         = useState<Product[]>(initialProducts);
   const [categories, setCategories]     = useState<Category[]>(initialCategories);
   const [toast, setToast]               = useState<{ msg: string; type: 'ok'|'err' } | null>(null);
@@ -513,41 +513,50 @@ export default function AdminClient({ initialProducts, initialCategories }: {
   ];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-zinc-950 text-white">
+    <div dir="rtl" className="min-h-screen bg-zinc-950 text-white pb-20">
+      <div className="max-w-2xl mx-auto p-4 md:p-6 space-y-6">
 
-      {/* ── Fixed Sidebar ──────────────────────────────────────────────────────── */}
-      <aside className="fixed top-0 right-0 h-full w-52 bg-black/60 backdrop-blur-xl border-l border-white/8 flex flex-col z-50">
-        <div className="p-5 border-b border-white/8">
-          <p className="text-[10px] text-white/30 uppercase tracking-widest">لوحة تحكم</p>
-          <h1 className="text-base font-black text-white mt-0.5">Cheese 1 Oven 🍕</h1>
-        </div>
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map(item => (
-            <button key={item.id} onClick={() => setSection(item.id)}
-              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all text-right ${
-                section === item.id
-                  ? 'bg-pink-600/20 text-pink-300 border border-pink-500/30'
-                  : 'text-white/50 hover:text-white hover:bg-white/5'
-              }`}>
-              <span className="shrink-0">{item.icon}</span> {item.label}
+        {/* MENU */}
+        {section === 'menu' && (
+          <div className="space-y-4 pt-8 md:pt-16">
+            <div className="text-center mb-10 space-y-2">
+              <p className="text-xs text-white/40 uppercase tracking-widest font-black">لوحة تحكم</p>
+              <h1 className="text-3xl font-black text-white">Cheese 1 Oven 🍕</h1>
+            </div>
+
+            <div className="space-y-3">
+              {navItems.map(item => (
+                <button key={item.id} onClick={() => setSection(item.id)}
+                  className="w-full flex items-center justify-between p-5 bg-zinc-900 border border-white/8 rounded-2xl hover:bg-zinc-800 hover:border-white/20 transition-all group shadow-lg">
+                  <div className="flex items-center gap-4 text-lg font-black text-white/90 group-hover:text-white">
+                    <span className="text-pink-400 p-3 bg-pink-500/10 rounded-xl group-hover:scale-110 group-hover:bg-pink-500/20 transition-all">
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </div>
+                  <ChevronLeft size={20} className="text-white/30 group-hover:text-pink-400 group-hover:-translate-x-1 transition-all"/>
+                </button>
+              ))}
+            </div>
+
+            <a href="/" className="w-full flex items-center justify-center gap-2 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-colors mt-8 font-bold text-sm text-white/50 hover:text-white">
+              <ArrowRight size={18}/> العودة للتطبيق
+            </a>
+          </div>
+        )}
+
+        {/* CONTENT WRAPPER */}
+        {section !== 'menu' && (
+          <div className="space-y-6 pt-4">
+            <button onClick={() => setSection('menu')}
+              className="flex items-center gap-2 text-pink-400 font-bold bg-pink-500/10 hover:bg-pink-500/20 px-4 py-2.5 rounded-xl transition-colors text-sm w-fit">
+              <ArrowRight size={18}/> رجوع للقائمة
             </button>
-          ))}
-        </nav>
-        <div className="p-3 border-t border-white/8">
-          <a href="/" className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-sm text-white/40 hover:text-white hover:bg-white/5 transition-colors">
-            <ArrowLeft size={16}/> العودة للتطبيق
-          </a>
-        </div>
-      </aside>
 
-      {/* ── Scrollable main content (margin-right = sidebar width) ─────────────── */}
-      <main className="mr-52 min-h-screen overflow-y-auto">
-        <div className="max-w-3xl mx-auto p-6 space-y-6">
-
-          {/* DASHBOARD */}
-          {section === 'dashboard' && (
-            <div className="space-y-5">
-              <h2 className="text-xl font-black">لوحة التحكم الرئيسية</h2>
+            {/* DASHBOARD */}
+            {section === 'dashboard' && (
+              <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <h2 className="text-2xl font-black">لوحة التحكم الرئيسية</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {stats.map(s => (
                   <div key={s.label} className="bg-zinc-900 border border-white/8 rounded-2xl p-4">
@@ -664,8 +673,10 @@ export default function AdminClient({ initialProducts, initialCategories }: {
             </div>
           )}
 
-        </div>
-      </main>
+          </div>
+        )}
+
+      </div>
 
       {/* ── Product Add/Edit Modal ─────────────────────────────────────────── */}
       {(addProduct || editProduct) && (
