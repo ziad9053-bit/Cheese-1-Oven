@@ -167,7 +167,7 @@ export const ProductScene: React.FC<Props> = ({
       {/* ── Add button + price — OUTSIDE AnimatePresence so they never flicker ── */}
       {mounted && product && (
         <div 
-          className="absolute z-50 pointer-events-auto flex flex-col items-center gap-1.5"
+          className="absolute z-50 pointer-events-auto flex flex-row items-center gap-3"
           style={{ 
             top: '50%', 
             left: '50%',
@@ -195,7 +195,7 @@ export const ProductScene: React.FC<Props> = ({
               transition={{ duration: 0.15 }}
               className="bg-black/90 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/30 shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
             >
-              <span className="text-sm md:text-base font-black text-green-400 whitespace-nowrap">{product.price} ر.س</span>
+              <span className="text-sm md:text-base font-black text-pink-500 whitespace-nowrap">{product.price} ر.س</span>
             </motion.div>
           </AnimatePresence>
         </div>
