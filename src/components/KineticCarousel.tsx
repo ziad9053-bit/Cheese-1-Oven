@@ -228,29 +228,6 @@ export const KineticCarousel: React.FC<Props> = ({
         })}
       </div>
 
-      {/* Central large pizza — animates on activeIndex change */}
-      <div
-        className="absolute z-20 pointer-events-none"
-        style={{ width: CENTER_SIZE, height: CENTER_SIZE }}
-      >
-        <AnimatePresence mode="wait">
-          {products[activeIndex]?.image_url && (
-            <motion.img
-              key={products[activeIndex].id}
-              src={products[activeIndex].image_url}
-              alt={products[activeIndex].name}
-              className="w-full h-full object-contain rounded-full"
-              style={{ filter: 'drop-shadow(0 20px 45px rgba(0,0,0,0.9))' }}
-              initial={{ scale: 0.35, opacity: 0 }}
-              animate={{ scale: 1,    opacity: 1 }}
-              exit={{    scale: 1.2,  opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-              draggable={false}
-            />
-          )}
-        </AnimatePresence>
-      </div>
-
       {/* Name & price below ring */}
       <div
         className="absolute z-30 text-center pointer-events-none"
