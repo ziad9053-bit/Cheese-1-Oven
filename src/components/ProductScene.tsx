@@ -99,12 +99,12 @@ export const ProductScene: React.FC<Props> = ({
               className="absolute z-50 pointer-events-none flex items-center justify-center"
               initial={{ scale: 1.5, opacity: 0 }}
               animate={{ 
-                scale: [1.5, 1, 0], 
-                opacity: [0, 1, 0],
+                scale: [1.5, 1, 1, 0], 
+                opacity: [0, 1, 1, 0],
               }}
               transition={{ 
-                duration: 1.8, 
-                times: [0, 0.2, 1],
+                duration: 2.2, 
+                times: [0, 0.15, 0.65, 1],
                 ease: "easeInOut"
               }}
             >
