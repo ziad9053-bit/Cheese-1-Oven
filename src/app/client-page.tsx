@@ -21,7 +21,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   const [selectedSauceIds, setSelectedSauceIds] = useState<string[]>([]);
 
   const activeProduct = products[activeIndex];
-  const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/PRODUCT-IMAGES/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/PRODUCT-IMAGES/images/bg-pastry.jpg';
+  const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pastry.jpg';
 
   const handleAddSauce = (sauce: Sauce) => {
     if (selectedSauceIds.includes(sauce.id)) {

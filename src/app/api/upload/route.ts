@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     const { data, error } = await supabaseAdmin.storage
-      .from('PRODUCT-IMAGES')
+      .from('product-images')
       .upload(path, buffer, {
         contentType: file.type || 'image/webp',
         upsert: true,
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data: urlData } = supabaseAdmin.storage
-      .from('PRODUCT-IMAGES')
+      .from('product-images')
       .getPublicUrl(data.path);
 
     return NextResponse.json({ url: urlData.publicUrl });
