@@ -11,8 +11,8 @@ interface Props {
   onIndexChange: (index: number) => void;
 }
 
-// Degrees per second (≈ 15°/sec)
-const SPIN_SPEED_PER_SEC = 15;
+// Degrees per frame (≈ 15°/sec at 60fps)
+const SPIN_SPEED = 0.25;
 
 export const KineticCarousel: React.FC<Props> = React.memo(({
   products,
@@ -95,12 +95,7 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
   useEffect(() => {
     if (!mounted) return;
 
-    let lastTime = performance.now();
-
-    const tick = (now: number) => {
-      const dt = now - lastTime;
-      lastTime = now;
-
+    const tick = () => {
       if (targetAngle.current !== null) {
         /* ── SNAP MODE: lerp towards target ── */
         const diff = targetAngle.current - ringAngle.current;
@@ -108,12 +103,11 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
           ringAngle.current   = targetAngle.current;
           targetAngle.current = null; // done snapping → resume auto-spin
         } else {
-          // Time-adjusted lerp (approximate)
-          ringAngle.current += diff * (1 - Math.exp(-dt * 0.01));
+          ringAngle.current += diff * 0.13; // smooth ease-out (frame-based, never teleports)
         }
       } else if (!isPanning.current) {
-        /* ── AUTO-SPIN: time-based constant speed ── */
-        ringAngle.current += (SPIN_SPEED_PER_SEC * dt) / 1000;
+        /* ── AUTO-SPIN: frame-based constant speed ── */
+        ringAngle.current += SPIN_SPEED;
         // Notice: We removed the automatic nearestIndex() update here.
         // The central pizza will now ONLY change when the user explicitly clicks a thumbnail or swipes.
       }
@@ -180,7 +174,6 @@ export const KineticCarousel: React.FC<Props> = React.memo(({
               <div
                 onClick={(e) => {
                   e.stopPropagation();
-                  snapToIndex(index);
                   onIndexChange(index);
                 }}
                 className="flex flex-col items-center gap-1 cursor-pointer"
