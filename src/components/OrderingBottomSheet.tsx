@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronUp, Trash2, ShoppingBag, Plus, Minus, CreditCard, Sparkles } from 'lucide-react';
+import { ChevronUp, Trash2, ShoppingBag, Plus, Minus, CreditCard, Sparkles, ArrowRight } from 'lucide-react';
 import { Product, Sauce, Drink } from '@/lib/data';
 
 interface CartItem {
@@ -95,24 +95,27 @@ export const OrderingBottomSheet: React.FC<Props> = ({
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="fixed bottom-0 left-0 right-0 h-[85vh] bg-zinc-950 border-t border-white/10 rounded-t-[32px] z-50 flex flex-col overflow-hidden"
       >
-        <div 
-          className="w-full flex justify-center pt-3 pb-2 cursor-pointer touch-none"
-          onClick={onClose}
-        >
-          <div className="w-12 h-1.5 bg-white/20 rounded-full" />
+        {/* Header section with explicit back button */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-20">
+          <button 
+            onClick={onClose}
+            className="flex items-center gap-2 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+          >
+            <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
+            <span className="font-bold text-xs md:text-sm">العودة للواجهة</span>
+          </button>
+          
+          <h2 className="text-base md:text-lg font-black text-white flex items-center gap-2">
+            <ShoppingBag className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            السلة
+          </h2>
+          
+          <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold">
+            {cartItems.length + drinkCartItems.length}
+          </span>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 pb-24 scrollbar-none">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-black text-white flex items-center gap-2">
-              <ShoppingBag className="w-6 h-6 text-primary" />
-              سلة المشتريات
-            </h2>
-            <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm font-bold">
-              {cartItems.length + drinkCartItems.length} عناصر
-            </span>
-          </div>
-
+        <div className="flex-1 overflow-y-auto px-6 pb-24 pt-6 scrollbar-none">
           <div className="space-y-4">
             <AnimatePresence>
               {cartItems.length === 0 && drinkCartItems.length === 0 ? (
