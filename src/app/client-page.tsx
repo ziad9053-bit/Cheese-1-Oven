@@ -7,6 +7,7 @@ import { ProductScene } from '@/components/ProductScene';
 import { KineticCarousel } from '@/components/KineticCarousel';
 import { OrderingBottomSheet } from '@/components/OrderingBottomSheet';
 import { ShoppingCart } from 'lucide-react';
+import SauceSelector from '@/components/SauceSelector';
 
 interface Props {
   products: Product[];
@@ -20,7 +21,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [drinkItems, setDrinkItems] = useState<any[]>([]);
-  const [selectedSauceIds, setSelectedSauceIds] = useState<string[]>([]);
+  const [selectedSauceId, setSelectedSauceId] = useState<string | null>(null);
 
   const activeProduct = products[activeIndex];
   const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pastry.jpg';
@@ -38,14 +39,6 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
 
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0) + drinkItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  const handleAddSauce = (sauce: Sauce) => {
-    if (selectedSauceIds.includes(sauce.id)) {
-      setSelectedSauceIds(selectedSauceIds.filter(id => id !== sauce.id));
-    } else {
-      setSelectedSauceIds([...selectedSauceIds, sauce.id]);
-    }
-  };
-
   const handleAddProduct = () => {
     if (!activeProduct) return;
     
@@ -53,11 +46,11 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       id: Math.random().toString(36).substring(7),
       product: activeProduct,
       quantity: 1,
-      selectedSauceIds: [...selectedSauceIds]
+      selectedSauceIds: selectedSauceId ? [selectedSauceId] : []
     };
     
     setCartItems([...cartItems, newItem]);
-    setSelectedSauceIds([]);
+    setSelectedSauceId(null);
   };
 
   const handleUpdateQuantity = (id: string, delta: number) => {
@@ -136,11 +129,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         {activeProduct ? (
           <ProductScene 
             product={activeProduct}
-            bgImageUrl={bgImageUrl}
-            sauces={sauces}
-            selectedSauceIds={selectedSauceIds}
-            onAddSauce={handleAddSauce}
             onAddClick={handleAddProduct}
+            bgImageUrl={bgImageUrl}
           />
         ) : (
           <div className="flex items-center justify-center h-full pointer-events-auto">
@@ -171,6 +161,14 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
           </div>
         )}
       </button>
+
+      {/* Sauce Selector Navigation Bar */}
+      {activeProduct?.category_id === 1 && (
+        <SauceSelector 
+          selectedSauce={selectedSauceId}
+          onSelectSauce={setSelectedSauceId}
+        />
+      )}
 
       <OrderingBottomSheet 
         isOpen={isSheetOpen}
