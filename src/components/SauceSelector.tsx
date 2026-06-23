@@ -34,15 +34,21 @@ export default function SauceSelector({ sauces, selectedSauce, onSelectSauce }: 
                 className="w-full h-full object-contain"
               />
             </div>
-            <span 
-              className={`text-[11px] md:text-[13px] font-black tracking-wide text-center leading-tight transition-all duration-300 ${
-                selectedSauce === sauce.id 
-                  ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,1)]' 
-                  : 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.8)]'
+            <div 
+              className={`bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all duration-300 ${
+                selectedSauce === sauce.id ? 'border-yellow-500/50 bg-black/90' : ''
               }`}
             >
-              {selectedSauce === sauce.id ? sauce.name : 'صوص'}
-            </span>
+              <span 
+                className={`text-[11px] md:text-[13px] font-black tracking-wide text-center leading-tight transition-all duration-300 ${
+                  selectedSauce === sauce.id 
+                    ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,1)]' 
+                    : 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.8)]'
+                }`}
+              >
+                {selectedSauce === sauce.id ? sauce.name : 'صوص'}
+              </span>
+            </div>
           </button>
         ))}
       </div>

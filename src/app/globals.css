@@ -131,24 +131,24 @@
 
 @keyframes sauceIdle {
   0%, 100% {
-    filter: drop-shadow(0 10px 15px rgba(250, 204, 21, 0.2));
-    transform: scale(1) rotate(20deg);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)) drop-shadow(0 10px 15px rgba(250, 204, 21, 0.2));
+    transform: scale(1) rotate(40deg);
   }
   50% {
-    filter: drop-shadow(0 25px 20px rgba(250, 204, 21, 0.5));
-    transform: scale(1.03) rotate(18deg);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)) drop-shadow(0 25px 20px rgba(250, 204, 21, 0.5));
+    transform: scale(1.03) rotate(38deg);
   }
 }
 
 @keyframes sauceActive {
   0%, 100% {
-    filter: drop-shadow(0 15px 20px rgba(250, 204, 21, 0.7));
-    transform: scale(1.08) rotate(20deg);
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6)) drop-shadow(0 15px 20px rgba(250, 204, 21, 0.7));
+    transform: scale(1.08) rotate(40deg);
   }
   50% {
-    /* Glow strongly downwards with a bright yellow color */
-    filter: drop-shadow(0 35px 25px rgba(250, 204, 21, 1));
-    transform: scale(1.15) rotate(22deg);
+    /* Glow strongly downwards with a bright yellow color, plus white backing */
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)) drop-shadow(0 35px 25px rgba(250, 204, 21, 1));
+    transform: scale(1.15) rotate(42deg);
   }
 }
 
