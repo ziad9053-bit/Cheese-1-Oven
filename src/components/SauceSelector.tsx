@@ -51,24 +51,18 @@ export default function SauceSelector({ sauces, selectedSauce, onSelectSauce, on
                 </div>
               )}
             </div>
-            <div 
-              className={`px-2 py-0.5 rounded-full border shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all duration-300 flex flex-col items-center justify-center ${
-                selectedSauce === sauce.id 
-                  ? 'bg-[#FF6347] border-white' 
-                  : 'bg-black/70 backdrop-blur-sm border-white/10'
-              }`}
-            >
+            <div className="flex flex-col items-center justify-center pt-1">
               <span 
-                className={`text-[11px] md:text-[13px] font-black tracking-wide text-center leading-tight transition-all duration-300 ${
-                  selectedSauce === sauce.id 
-                    ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' 
-                    : 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.8)]'
-                }`}
+                className={`text-[12px] md:text-[14px] font-black tracking-wide text-center leading-tight transition-all duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]`}
+                style={{
+                  color: '#FF6347',
+                  WebkitTextStroke: '1px white'
+                }}
               >
                 {selectedSauce === sauce.id ? sauce.name : 'صوص'}
               </span>
               {selectedSauce === sauce.id && (
-                <span className="text-[10px] md:text-[11px] text-yellow-300 font-extrabold tracking-wider leading-tight">
+                <span className="text-[10px] md:text-[11px] text-yellow-300 font-extrabold tracking-wider leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
                   {sauce.price} ريال
                 </span>
               )}

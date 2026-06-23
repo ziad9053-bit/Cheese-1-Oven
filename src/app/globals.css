@@ -131,11 +131,12 @@
 
 @keyframes sauceIdle {
   0%, 100% {
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)) drop-shadow(0 10px 15px rgba(250, 204, 21, 0.2));
+    /* Permanent Neon Cyan Edge Contour */
+    filter: drop-shadow(0 0 1px #00f3ff) drop-shadow(0 0 2px #00f3ff) drop-shadow(0 0 8px #00f3ff);
     transform: scale(1) rotate(40deg);
   }
   50% {
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)) drop-shadow(0 25px 20px rgba(250, 204, 21, 0.5));
+    filter: drop-shadow(0 0 1px #00f3ff) drop-shadow(0 0 3px #00f3ff) drop-shadow(0 0 12px #00f3ff) drop-shadow(0 10px 15px rgba(0, 243, 255, 0.4));
     transform: scale(1.03) rotate(38deg);
   }
 }
