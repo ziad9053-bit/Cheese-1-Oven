@@ -53,10 +53,10 @@ export default function SauceSelector({ sauces, selectedSauce, onSelectSauce, on
             </div>
             <div className="flex flex-col items-center justify-center pt-1">
               <span 
-                className={`text-[12px] md:text-[14px] font-black tracking-wide text-center leading-tight transition-all duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]`}
+                className={`text-[12px] md:text-[14px] font-black tracking-wide text-center leading-tight transition-all duration-300`}
                 style={{
                   color: 'white',
-                  WebkitTextStroke: '1px #FF6347'
+                  textShadow: '1px 1px 0 #FF6347, -1px -1px 0 #FF6347, 1px -1px 0 #FF6347, -1px 1px 0 #FF6347, 0px 3px 5px rgba(0,0,0,0.9)'
                 }}
               >
                 {selectedSauce === sauce.id ? sauce.name : 'صوص'}
