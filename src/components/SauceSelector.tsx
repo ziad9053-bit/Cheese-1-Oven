@@ -11,7 +11,7 @@ interface Props {
 
 export default function SauceSelector({ sauces, selectedSauce, onSelectSauce }: Props) {
   return (
-    <div className="fixed bottom-6 right-6 md:right-8 z-40 flex items-end">
+    <div className="fixed bottom-6 right-16 md:right-24 z-40 flex items-end">
       <div className="flex items-end -space-x-3 space-x-reverse md:-space-x-5">
         {sauces.filter(s => s.is_available).map((sauce) => (
           <button
@@ -28,7 +28,7 @@ export default function SauceSelector({ sauces, selectedSauce, onSelectSauce }: 
               style={{
                 transition: 'transform .25s ease',
                 filter: 'drop-shadow(0 8px 18px rgba(0,0,0,.35))',
-                transform: selectedSauce === sauce.id ? 'scale(1.08) rotate(-4deg)' : 'scale(1) rotate(0deg)'
+                transform: selectedSauce === sauce.id ? 'scale(1.08) rotate(10deg)' : 'scale(1) rotate(20deg)'
               }}
             >
               <img 
