@@ -26,16 +26,18 @@ export default function SauceSelector({ sauces, selectedSauce, onSelectSauce, on
                 : 'z-0 opacity-80 hover:opacity-100 hover:-translate-y-1 hover:z-10'
             }`}
           >
-            <div 
-              className={`relative w-16 h-16 md:w-24 md:h-24 ${
-                selectedSauce === sauce.id ? 'sauce-active' : 'sauce-idle'
-              }`}
-            >
-              <img 
-                src={sauce.image_url} 
-                alt={sauce.name}
-                className="w-full h-full object-contain"
-              />
+            <div className="relative w-16 h-16 md:w-24 md:h-24">
+              <div 
+                className={`w-full h-full ${
+                  selectedSauce === sauce.id ? 'sauce-active' : 'sauce-idle'
+                }`}
+              >
+                <img 
+                  src={sauce.image_url} 
+                  alt={sauce.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
               {selectedSauce === sauce.id && onAddSauceToCart && (
                 <div 
                   role="button"
