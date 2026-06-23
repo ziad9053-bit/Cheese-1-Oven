@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import {
   Plus, Pencil, Trash2, Upload, Check, X, Loader2,
   ImagePlus, FileImage, LayoutDashboard, Package,
-  Layers, Image, Palette, ArrowLeft, ArrowRight, ChevronLeft
+  Layers, Image, Palette, ArrowLeft, ArrowRight, ChevronLeft, Lock
 } from 'lucide-react';
 
 const supabase = createClient(
@@ -539,6 +539,8 @@ export default function AdminClient({ initialProducts, initialCategories }: {
   const [editSauce, setEditSauce]       = useState<Sauce | null>(null);
   const [addSauce, setAddSauce]         = useState(false);
   const [confirmDel, setConfirmDel]     = useState<{ type: 'product'|'category'|'sauce'; id: any } | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
 
   const showToast = (msg: string, type: 'ok'|'err') => {
     setToast({ msg, type });
@@ -655,8 +657,52 @@ export default function AdminClient({ initialProducts, initialCategories }: {
   ];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-zinc-950 text-white pb-20">
-      <div className="max-w-2xl mx-auto p-4 md:p-6 space-y-6">
+    <div dir="rtl" className="min-h-screen bg-zinc-950 text-white pb-20 flex flex-col">
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-full flex items-center gap-2 shadow-xl animate-in fade-in slide-in-from-top-5 duration-300 ${toast.type === 'ok' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+          <span className="text-sm font-bold">{toast.msg}</span>
+        </div>
+      )}
+
+      {!isAuthenticated ? (
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-white/10 p-8 rounded-3xl w-full max-w-sm space-y-6 shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-pink-600/20 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-500/30">
+                <Lock size={30} />
+              </div>
+              <h2 className="text-2xl font-black text-white">تسجيل الدخول</h2>
+              <p className="text-white/40 text-sm">أدخل كلمة المرور للوصول إلى لوحة التحكم والـ Bucket</p>
+            </div>
+            
+            <input 
+              type="password" 
+              value={passwordInput} 
+              onChange={e => setPasswordInput(e.target.value)} 
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  if (passwordInput === '12345') setIsAuthenticated(true);
+                  else showToast('كلمة السر خاطئة!', 'err');
+                }
+              }}
+              placeholder="كلمة السر..." 
+              className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 text-center tracking-widest font-bold"
+            />
+            
+            <button 
+              onClick={() => {
+                if (passwordInput === '12345') setIsAuthenticated(true);
+                else showToast('كلمة السر خاطئة!', 'err');
+              }} 
+              className="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold py-3.5 rounded-2xl transition-colors shadow-lg shadow-pink-600/20"
+            >
+              دخول
+            </button>
+          </div>
+        </div>
+      ) : (
+      <div className="max-w-2xl mx-auto w-full p-4 md:p-6 space-y-6">
 
         {/* MENU */}
         {section === 'menu' && (
@@ -853,10 +899,8 @@ export default function AdminClient({ initialProducts, initialCategories }: {
             </div>
           )}
 
-          </div>
-        )}
-
       </div>
+      )}
 
       {/* ── Product Add/Edit Modal ─────────────────────────────────────────── */}
       {(addProduct || editProduct) && (
@@ -908,6 +952,8 @@ export default function AdminClient({ initialProducts, initialCategories }: {
       )}
 
       {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)}/>}
+      </div>
+      )}
     </div>
   );
 }
