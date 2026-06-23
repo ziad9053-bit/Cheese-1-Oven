@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Product } from '@/lib/data';
+import { Product, Sauce } from '@/lib/data';
 import { Plus } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -10,12 +10,14 @@ interface Props {
   product: Product;
   onAddClick: () => void;
   bgImageUrl?: string;
+  selectedSauce?: Sauce | null;
 }
 
 export const ProductScene: React.FC<Props> = ({ 
   product, 
   onAddClick, 
-  bgImageUrl
+  bgImageUrl,
+  selectedSauce
 }) => {
   const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
@@ -53,18 +55,39 @@ export const ProductScene: React.FC<Props> = ({
       {/* Scene Wrapper for shifting down (z-10 to sit below carousel z-30) */}
       <div className="absolute inset-0 z-10 pointer-events-none translate-y-6 md:translate-y-10">
         {/* Central pizza image — animates only when product changes */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none relative">
         <AnimatePresence mode="popLayout">
-          <motion.img
+          {/* We wrap the pizza and the sauce effect in one motion container so they animate in together when product changes */}
+          <motion.div
             key={product?.id}
-            src={product?.image_url || ''}
-            alt={product?.name || ''}
-            className="w-[200px] h-[200px] md:w-[320px] md:h-[320px] object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] rounded-full"
+            className="relative w-[200px] h-[200px] md:w-[320px] md:h-[320px]"
             initial={{ scale: 0.2, opacity: 0, rotate: -30 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 1.4, opacity: 0, rotate: 15 }}
             transition={{ type: "spring", stiffness: 380, damping: 30, mass: 0.8 }}
-          />
+          >
+            <img
+              src={product?.image_url || ''}
+              alt={product?.name || ''}
+              className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] rounded-full"
+            />
+            
+            {/* SAUCE EFFECT LAYER OVER PIZZA */}
+            <AnimatePresence>
+              {selectedSauce && selectedSauce.description?.startsWith('http') && (
+                <motion.img
+                  key={`sauce-effect-${selectedSauce.id}`}
+                  src={selectedSauce.description}
+                  alt="Sauce Effect"
+                  className="absolute inset-0 w-full h-full object-contain drop-shadow-xl"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.1, filter: "blur(4px)" }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                />
+              )}
+            </AnimatePresence>
+          </motion.div>
         </AnimatePresence>
 
         {/* Shadow under pizza */}

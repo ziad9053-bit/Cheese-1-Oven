@@ -162,6 +162,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
             product={activeProduct}
             onAddClick={handleAddProduct}
             bgImageUrl={bgImageUrl}
+            selectedSauce={sauces.find(s => s.id === selectedSauceId) || null}
           />
         ) : (
           <div className="flex items-center justify-center h-full pointer-events-auto">

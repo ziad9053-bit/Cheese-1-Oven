@@ -20,7 +20,7 @@ interface Product {
 }
 interface Category { id: number; name: string; slug: string; }
 interface Sauce { id: number; name: string; description?: string; image_url: string; price: number; is_available: boolean; category_id?: number; product_type?: string; }
-type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'sauces' | 'images';
+type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'sauces' | 'sauce-effects' | 'images';
 
 // ── Server upload (bypasses RLS) ──────────────────────────────────────────────
 async function serverUpload(blob: Blob, path: string): Promise<string | null> {
@@ -653,6 +653,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
     { id: 'products'  as Section, label: 'المنتجات',    icon: <Package size={17}/> },
     { id: 'categories'as Section, label: 'الأصناف',     icon: <Layers size={17}/> },
     { id: 'sauces'    as Section, label: 'الصوصات',      icon: <img src="https://emojigraph.org/media/apple/drop-of-blood_1fa78.png" className="w-4 h-4 opacity-70 filter hue-rotate-90"/> },
+    { id: 'sauce-effects' as Section, label: 'تأثيرات الصوص', icon: <Image size={17}/> },
     { id: 'images'    as Section, label: 'إدارة الصور', icon: <Image size={17}/> },
   ];
 
@@ -887,6 +888,89 @@ export default function AdminClient({ initialProducts, initialCategories }: {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* SAUCE EFFECTS */}
+          {section === 'sauce-effects' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-black">تأثيرات الصوص ({sauces.length})</h2>
+                <p className="text-xs text-white/40">ارفع صورة شفافة (PNG/WEBP) لكل صوص لتظهر فوق البيتزا عند اختياره</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {sauces.map(s => {
+                  const hasEffect = s.description?.startsWith('http');
+                  return (
+                    <div key={s.id} className="bg-zinc-900 border border-white/8 rounded-2xl p-4 flex flex-col gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-black/50 flex items-center justify-center shrink-0 border border-white/10 p-1">
+                          <img src={s.image_url} alt={s.name} className="w-full h-full object-contain"/>
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-black text-white">{s.name}</p>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full mt-1 inline-block ${hasEffect ? 'bg-green-900/50 text-green-400' : 'bg-white/10 text-white/40'}`}>
+                            {hasEffect ? '✅ تأثير مضاف' : 'لم يتم إضافة تأثير'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        {hasEffect ? (
+                          <div className="relative w-20 h-20 bg-black/30 rounded-xl border border-white/10 flex items-center justify-center p-1 group">
+                            <img src={s.description!} alt="Effect" className="w-full h-full object-contain"/>
+                            <button 
+                              onClick={async () => {
+                                const { error } = await supabase.from('products').update({ description: '' }).eq('id', s.id);
+                                if (!error) {
+                                  setSauces(ss => ss.map(ss => ss.id === s.id ? { ...ss, description: '' } : ss));
+                                  showToast('تم إزالة التأثير', 'ok');
+                                }
+                              }}
+                              className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl"
+                            >
+                              <Trash2 size={16} className="text-red-400"/>
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="w-20 h-20 bg-black/30 rounded-xl border border-dashed border-white/20 flex items-center justify-center flex-col gap-1 text-white/30">
+                            <ImagePlus size={16}/>
+                          </div>
+                        )}
+                        
+                        <div className="flex-1">
+                          <label className="flex items-center justify-center gap-2 w-full bg-white/5 hover:bg-white/10 text-white py-2 rounded-xl text-xs font-bold border border-white/10 transition-colors cursor-pointer">
+                            <Upload size={14}/> رفع تأثير جديد
+                            <input 
+                              type="file" 
+                              accept="image/png,image/webp" 
+                              className="hidden" 
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                showToast('جاري الرفع...', 'ok');
+                                const url = await serverUpload(file, `images/sauce-effects/${s.id}-${Date.now()}.png`);
+                                if (url) {
+                                  const { error } = await supabase.from('products').update({ description: url }).eq('id', s.id);
+                                  if (!error) {
+                                    setSauces(ss => ss.map(ss => ss.id === s.id ? { ...ss, description: url } : ss));
+                                    showToast('✅ تم تحديث التأثير بنجاح', 'ok');
+                                  } else {
+                                    showToast('حدث خطأ في قاعدة البيانات', 'err');
+                                  }
+                                } else {
+                                  showToast('فشل الرفع', 'err');
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
