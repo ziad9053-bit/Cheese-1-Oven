@@ -80,9 +80,9 @@ export const ProductScene: React.FC<Props> = ({
                   src={selectedSauce.description}
                   alt="Sauce Effect"
                   className="absolute inset-0 w-full h-full object-contain drop-shadow-xl"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.1, filter: "blur(4px)" }}
+                  initial={{ opacity: 0, scale: 0.75 }}
+                  animate={{ opacity: 1, scale: 0.85 }}
+                  exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 />
               )}
