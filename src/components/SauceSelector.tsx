@@ -3,13 +3,16 @@
 import React from 'react';
 import { Sauce } from '@/lib/data';
 
+import { Plus } from 'lucide-react';
+
 interface Props {
   sauces: Sauce[];
   selectedSauce: number | null;
   onSelectSauce: (id: number | null) => void;
+  onAddSauceToCart?: (sauce: Sauce) => void;
 }
 
-export default function SauceSelector({ sauces, selectedSauce, onSelectSauce }: Props) {
+export default function SauceSelector({ sauces, selectedSauce, onSelectSauce, onAddSauceToCart }: Props) {
   return (
     <div className="fixed top-8 left-1/2 -translate-x-1/2 z-40 flex items-start">
       <div className="flex items-start -space-x-3 space-x-reverse md:-space-x-5">
@@ -33,21 +36,42 @@ export default function SauceSelector({ sauces, selectedSauce, onSelectSauce }: 
                 alt={sauce.name}
                 className="w-full h-full object-contain"
               />
+              {selectedSauce === sauce.id && onAddSauceToCart && (
+                <div 
+                  role="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddSauceToCart(sauce);
+                    // Optional: alert or visual feedback can be added here
+                  }}
+                  className="absolute -top-2 right-0 md:-top-3 md:-right-2 z-50 bg-red-600 hover:bg-red-500 text-white p-1 md:p-1.5 rounded-full shadow-lg border border-white transition-transform hover:scale-110 active:scale-95 flex items-center justify-center cursor-pointer"
+                  title="إضافة للسلة"
+                >
+                  <Plus className="w-4 h-4 md:w-5 md:h-5" strokeWidth={3} />
+                </div>
+              )}
             </div>
             <div 
-              className={`bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all duration-300 ${
-                selectedSauce === sauce.id ? 'border-yellow-500/50 bg-black/90' : ''
+              className={`px-2 py-0.5 rounded-full border shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all duration-300 flex flex-col items-center justify-center ${
+                selectedSauce === sauce.id 
+                  ? 'bg-[#FF6347] border-white' 
+                  : 'bg-black/70 backdrop-blur-sm border-white/10'
               }`}
             >
               <span 
                 className={`text-[11px] md:text-[13px] font-black tracking-wide text-center leading-tight transition-all duration-300 ${
                   selectedSauce === sauce.id 
-                    ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,1)]' 
+                    ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' 
                     : 'text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.8)]'
                 }`}
               >
                 {selectedSauce === sauce.id ? sauce.name : 'صوص'}
               </span>
+              {selectedSauce === sauce.id && (
+                <span className="text-[10px] md:text-[11px] text-yellow-300 font-extrabold tracking-wider leading-tight">
+                  {sauce.price} ريال
+                </span>
+              )}
             </div>
           </button>
         ))}

@@ -53,6 +53,16 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
     setSelectedSauceId(null);
   };
 
+  const handleAddSauceToCart = (sauce: Sauce) => {
+    const newItem = {
+      id: Math.random().toString(36).substring(7),
+      product: sauce as any, // Sauce maps directly to Product since it comes from the same DB table
+      quantity: 1,
+      selectedSauceIds: []
+    };
+    setCartItems([...cartItems, newItem]);
+  };
+
   const handleUpdateQuantity = (id: string, delta: number) => {
     setCartItems(items => items.map(item => {
       if (item.id === id) {
@@ -168,6 +178,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
           sauces={sauces}
           selectedSauce={selectedSauceId}
           onSelectSauce={setSelectedSauceId}
+          onAddSauceToCart={handleAddSauceToCart}
         />
       )}
 
