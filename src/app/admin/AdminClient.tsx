@@ -939,7 +939,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
                           </div>
                         )}
                         
-                        <div className="flex-1">
+                        <div className="flex-1 flex flex-col gap-2">
                           <label className="flex items-center justify-center gap-2 w-full bg-white/5 hover:bg-white/10 text-white py-2 rounded-xl text-xs font-bold border border-white/10 transition-colors cursor-pointer">
                             <Upload size={14}/> رفع تأثير جديد
                             <input 
@@ -965,6 +965,21 @@ export default function AdminClient({ initialProducts, initialCategories }: {
                               }}
                             />
                           </label>
+                          
+                          {hasEffect && (
+                            <button 
+                              onClick={async () => {
+                                const { error } = await supabase.from('products').update({ description: '' }).eq('id', s.id);
+                                if (!error) {
+                                  setSauces(ss => ss.map(ss => ss.id === s.id ? { ...ss, description: '' } : ss));
+                                  showToast('تم إزالة التأثير', 'ok');
+                                }
+                              }}
+                              className="flex items-center justify-center gap-2 w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 py-2 rounded-xl text-xs font-bold border border-red-500/20 transition-colors"
+                            >
+                              <Trash2 size={14}/> حذف التأثير
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
