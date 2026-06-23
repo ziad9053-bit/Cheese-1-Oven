@@ -8,6 +8,7 @@ import { KineticCarousel } from '@/components/KineticCarousel';
 import { OrderingBottomSheet } from '@/components/OrderingBottomSheet';
 import { ShoppingCart } from 'lucide-react';
 import SauceSelector from '@/components/SauceSelector';
+import { playWhooshSound, playPopSound } from '@/lib/sounds';
 
 interface Props {
   products: Product[];
@@ -28,7 +29,17 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   const toastTimer = useRef<NodeJS.Timeout | null>(null);
   const cartTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // Play whoosh sound when changing pizza
+  useEffect(() => {
+    // Wrap in small timeout to let the animation start
+    const timer = setTimeout(() => {
+      playWhooshSound();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [activeIndex]);
+
   const showToast = (message: string) => {
+    playPopSound();
     setToastMessage(message);
     setCartPulse(true);
     
