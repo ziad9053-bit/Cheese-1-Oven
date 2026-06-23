@@ -55,7 +55,7 @@ export const ProductScene: React.FC<Props> = ({
       {/* Scene Wrapper for shifting down (z-10 to sit below carousel z-30) */}
       <div className="absolute inset-0 z-10 pointer-events-none translate-y-6 md:translate-y-10">
         {/* Central pizza image — animates only when product changes */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none relative">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <AnimatePresence mode="popLayout">
           {/* We wrap the pizza and the sauce effect in one motion container so they animate in together when product changes */}
           <motion.div
