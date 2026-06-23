@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Product, Sauce, Drink } from '@/lib/data';
 import { ProductScene } from '@/components/ProductScene';
@@ -22,6 +22,22 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [drinkItems, setDrinkItems] = useState<any[]>([]);
   const [selectedSauceId, setSelectedSauceId] = useState<number | null>(null);
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [cartPulse, setCartPulse] = useState(false);
+  const toastTimer = useRef<NodeJS.Timeout | null>(null);
+  const cartTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setCartPulse(true);
+    
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastMessage(null), 2500);
+    
+    if (cartTimer.current) clearTimeout(cartTimer.current);
+    cartTimer.current = setTimeout(() => setCartPulse(false), 400);
+  };
 
   const activeProduct = products[activeIndex];
   const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pastry.jpg';
@@ -51,6 +67,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
     
     setCartItems([...cartItems, newItem]);
     setSelectedSauceId(null);
+    showToast(`تم إضافة ${activeProduct.name} للسلة ✅`);
   };
 
   const handleAddSauceToCart = (sauce: Sauce) => {
@@ -61,6 +78,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       selectedSauceIds: []
     };
     setCartItems([...cartItems, newItem]);
+    showToast(`تم إضافة ${sauce.name} للسلة ✅`);
   };
 
   const handleUpdateQuantity = (id: string, delta: number) => {
@@ -86,6 +104,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
     } else {
       setDrinkItems([...drinkItems, { id: Math.random().toString(36).substring(7), drink, quantity: 1 }]);
     }
+    showToast(`تم إضافة ${drink.name} للسلة ✅`);
   };
 
   const handleUpdateDrinkQuantity = (id: string, delta: number) => {
@@ -159,10 +178,28 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         />
       </div>
 
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] bg-black/80 backdrop-blur-md border border-green-500 text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_rgba(34,197,94,0.5)] whitespace-nowrap pointer-events-none flex items-center justify-center"
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Floating Cart Button */}
       <button
         onClick={() => setIsSheetOpen(true)}
-        className="absolute bottom-6 left-6 md:bottom-10 md:left-10 z-[60] bg-green-500 text-white p-3.5 md:p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.6)] hover:scale-110 active:scale-95 transition-transform flex items-center justify-center border-2 border-white cursor-pointer"
+        className={`fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[60] text-white p-3.5 md:p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.6)] flex items-center justify-center border-2 border-white cursor-pointer transition-all duration-300 ${
+          cartPulse 
+            ? 'scale-125 bg-green-400 shadow-[0_0_40px_rgba(34,197,94,1)]' 
+            : 'hover:scale-110 active:scale-95 bg-green-500'
+        }`}
       >
         <ShoppingCart className="w-6 h-6 md:w-7 md:h-7" />
         {totalItems > 0 && (
