@@ -212,6 +212,30 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         )}
       </button>
 
+      {/* Brand Identity / Logo */}
+      {(() => {
+        const settingsProd = products.find(p => p.product_type === 'brand_settings');
+        if (!settingsProd?.description) return null;
+        try {
+          const settings = JSON.parse(settingsProd.description);
+          if (!settings.isVisible) return null;
+          return (
+            <div className="absolute top-2 md:-top-4 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none z-30">
+              <h1 
+                className="text-[90px] md:text-[140px] text-center whitespace-nowrap drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]"
+                style={{
+                  fontFamily: settings.font,
+                  color: settings.innerColor,
+                  WebkitTextStroke: `3px ${settings.outerColor}`,
+                }}
+              >
+                {settings.text}
+              </h1>
+            </div>
+          );
+        } catch(e) { return null; }
+      })()}
+
       {/* Sauce Selector Navigation Bar */}
       {activeProduct?.category_id === 1 && (
         <SauceSelector 

@@ -20,7 +20,7 @@ interface Product {
 }
 interface Category { id: number; name: string; slug: string; }
 interface Sauce { id: number; name: string; description?: string; image_url: string; price: number; is_available: boolean; category_id?: number; product_type?: string; }
-type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'sauces' | 'sauce-effects' | 'images';
+type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'sauces' | 'sauce-effects' | 'brand-identity' | 'images';
 
 // ── Server upload (bypasses RLS) ──────────────────────────────────────────────
 async function serverUpload(blob: Blob, path: string): Promise<string | null> {
@@ -654,6 +654,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
     { id: 'categories'as Section, label: 'الأصناف',     icon: <Layers size={17}/> },
     { id: 'sauces'    as Section, label: 'الصوصات',      icon: <img src="https://emojigraph.org/media/apple/drop-of-blood_1fa78.png" className="w-4 h-4 opacity-70 filter hue-rotate-90"/> },
     { id: 'sauce-effects' as Section, label: 'تأثيرات الصوص', icon: <Image size={17}/> },
+    { id: 'brand-identity' as Section, label: 'الهوية التجارية', icon: <Image size={17}/> }, /* Needs a better icon, maybe use Star or Crown, wait I'll just use a layout icon */
     { id: 'images'    as Section, label: 'إدارة الصور', icon: <Image size={17}/> },
   ];
 
@@ -986,6 +987,119 @@ export default function AdminClient({ initialProducts, initialCategories }: {
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* BRAND IDENTITY */}
+          {section === 'brand-identity' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-black">الهوية التجارية</h2>
+                <p className="text-xs text-white/40">تخصيص الشعار خلف قائمة الصوصات</p>
+              </div>
+              
+              {(() => {
+                const settingsProd = products.find(p => p.product_type === 'brand_settings');
+                const defaultSettings = { isVisible: true, text: 'Cheese 1 Oven', font: 'var(--font-pacifico)', innerColor: '#FF6347', outerColor: '#FFFDD0' };
+                let currentSettings = defaultSettings;
+                try { if (settingsProd?.description) currentSettings = { ...defaultSettings, ...JSON.parse(settingsProd.description) }; } catch(e){}
+
+                const saveSettings = async (newSettings: any) => {
+                  const desc = JSON.stringify(newSettings);
+                  if (settingsProd) {
+                    const { error } = await supabase.from('products').update({ description: desc }).eq('id', settingsProd.id);
+                    if (!error) {
+                      setProducts(ps => ps.map(p => p.id === settingsProd.id ? { ...p, description: desc } : p));
+                      showToast('تم حفظ إعدادات الهوية', 'ok');
+                    }
+                  } else {
+                    const payload = { name: 'Brand Settings', description: desc, price: 0, image_url: '', category_id: categories[0]?.id ?? 1, product_type: 'brand_settings', is_available: false };
+                    const { data, error } = await supabase.from('products').insert([payload]).select().single();
+                    if (!error && data) {
+                      setProducts(ps => [...ps, data as Product]);
+                      showToast('تم إنشاء وحفظ إعدادات الهوية', 'ok');
+                    }
+                  }
+                };
+
+                const update = (key: string, val: any) => {
+                  saveSettings({ ...currentSettings, [key]: val });
+                };
+
+                return (
+                  <div className="bg-zinc-900 border border-white/8 rounded-2xl p-5 space-y-6">
+                    {/* Live Preview */}
+                    <div className="h-40 bg-black/50 rounded-xl flex items-center justify-center overflow-hidden border border-white/10 relative">
+                      <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, #ffffff11 1px, transparent 1px)', backgroundSize: '10px 10px' }}/>
+                      {currentSettings.isVisible ? (
+                        <h1 
+                          className="text-5xl md:text-6xl text-center whitespace-nowrap drop-shadow-2xl"
+                          style={{
+                            fontFamily: currentSettings.font,
+                            color: currentSettings.innerColor,
+                            WebkitTextStroke: `2px ${currentSettings.outerColor}`,
+                          }}
+                        >
+                          {currentSettings.text}
+                        </h1>
+                      ) : (
+                        <p className="text-white/30 font-bold">الهوية مخفية 👁️‍🗨️</p>
+                      )}
+                    </div>
+
+                    {/* Controls */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <label className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5">
+                        <span className="text-sm font-bold text-white/80">عرض الهوية للعملاء</span>
+                        <button onClick={() => update('isVisible', !currentSettings.isVisible)}
+                          className={`w-12 h-6 rounded-full transition-colors flex items-center px-1 ${currentSettings.isVisible ? 'bg-green-500' : 'bg-zinc-700'}`}>
+                          <div className={`w-4 h-4 bg-white rounded-full transition-transform ${currentSettings.isVisible ? '-translate-x-6' : ''}`} />
+                        </button>
+                      </label>
+
+                      <label className="space-y-1">
+                        <span className="text-xs text-white/40">نص الهوية (اسم المحل)</span>
+                        <input type="text" value={currentSettings.text} onChange={e => {
+                          const val = e.target.value;
+                          const merged = { ...currentSettings, text: val };
+                          setProducts(ps => ps.map(p => p.id === settingsProd?.id ? { ...p, description: JSON.stringify(merged) } : p));
+                        }}
+                        onBlur={e => update('text', e.target.value)}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-pink-500 text-sm"/>
+                      </label>
+
+                      <label className="space-y-1">
+                        <span className="text-xs text-white/40">نوع الخط المميّز</span>
+                        <select value={currentSettings.font} onChange={e => update('font', e.target.value)}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-pink-500 text-sm" style={{ fontFamily: currentSettings.font }}>
+                          <option value="var(--font-pacifico)" style={{ fontFamily: 'var(--font-pacifico)' }}>Pacifico (مرح وانسيابي)</option>
+                          <option value="var(--font-lobster)" style={{ fontFamily: 'var(--font-lobster)' }}>Lobster (كلاسيكي)</option>
+                          <option value="var(--font-righteous)" style={{ fontFamily: 'var(--font-righteous)' }}>Righteous (عصري بارز)</option>
+                          <option value="var(--font-bebas)" style={{ fontFamily: 'var(--font-bebas)' }}>Bebas Neue (طويل وعريض)</option>
+                          <option value="var(--font-chewy)" style={{ fontFamily: 'var(--font-chewy)' }}>Chewy (كرتوني سميك)</option>
+                        </select>
+                      </label>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <label className="space-y-1">
+                          <span className="text-xs text-white/40">اللون الداخلي</span>
+                          <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-2 py-1.5">
+                            <input type="color" value={currentSettings.innerColor} onChange={e => update('innerColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"/>
+                            <span className="text-xs text-white/60 uppercase">{currentSettings.innerColor}</span>
+                          </div>
+                        </label>
+                        <label className="space-y-1">
+                          <span className="text-xs text-white/40">لون الإطار (الخارجي)</span>
+                          <div className="flex items-center gap-2 bg-black/40 border border-white/10 rounded-xl px-2 py-1.5">
+                            <input type="color" value={currentSettings.outerColor} onChange={e => update('outerColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border-0"/>
+                            <span className="text-xs text-white/60 uppercase">{currentSettings.outerColor}</span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
