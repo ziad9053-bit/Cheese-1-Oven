@@ -32,7 +32,7 @@ export default function SauceSelector({ selectedSauce, onSelectSauce }: Props) {
                 : 'opacity-70 hover:opacity-100 hover:scale-110'
             }`}
           >
-            <div className={`transform transition-transform duration-300 ${selectedSauce === sauce.id ? 'drop-shadow-[0_0_12px_rgba(250,204,21,0.6)]' : 'drop-shadow-lg'}`}>
+            <div className={`transform -rotate-[80deg] transition-transform duration-300 ${selectedSauce === sauce.id ? 'drop-shadow-[0_0_12px_rgba(250,204,21,0.6)]' : 'drop-shadow-lg'}`}>
               {sauce.component}
             </div>
             <span className={`text-[11px] md:text-[13px] font-black tracking-wide ${
