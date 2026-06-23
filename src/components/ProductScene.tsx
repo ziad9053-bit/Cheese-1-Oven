@@ -50,10 +50,10 @@ export const ProductScene: React.FC<Props> = ({
   return (
     <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-transparent">
 
-      {/* Scene Wrapper for shifting down */}
-      <div className="absolute inset-0 pointer-events-none translate-y-6 md:translate-y-10">
+      {/* Scene Wrapper for shifting down (z-10 to sit below carousel z-30) */}
+      <div className="absolute inset-0 z-10 pointer-events-none translate-y-6 md:translate-y-10">
         {/* Central pizza image — animates only when product changes */}
-        <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <AnimatePresence mode="popLayout">
           <motion.img
             key={product?.id}
@@ -94,16 +94,17 @@ export const ProductScene: React.FC<Props> = ({
           )}
         </AnimatePresence>
       </div>
+      </div>
 
-
-      {/* ── Add button + price — OUTSIDE AnimatePresence so they never flicker ── */}
+      {/* ── Add button + price — OUTSIDE so it can have z-50 and stay above the carousel ── */}
       {mounted && product && (
         <div 
           className="absolute z-50 pointer-events-auto flex flex-row items-center gap-3"
           style={{ 
             top: '50%', 
             left: '50%',
-            transform: `translate(calc(-50% + ${actionX}px), calc(-50% + ${actionY}px))` 
+            // We add the vertical translation (24px for mobile, 40px for desktop) here since it's outside the translated wrapper
+            transform: `translate(calc(-50% + ${actionX}px), calc(-50% + ${actionY}px + ${safeIsMobile ? 24 : 40}px))` 
           }}
         >
           <motion.button
@@ -134,7 +135,6 @@ export const ProductScene: React.FC<Props> = ({
           </AnimatePresence>
         </div>
       )}
-      </div>
     </div>
   );
 };

@@ -134,8 +134,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         <div className="absolute inset-0 bg-black/40 z-0" />
       </div>
       
-      {/* Layer 1 (z-30): Central product scene - must be above carousel so Add button is clickable */}
-      <div className="absolute inset-0 z-30 pointer-events-none">
+      {/* Layer 1: Central product scene */}
+      <div className="absolute inset-0 pointer-events-none">
         {activeProduct ? (
           <ProductScene 
             product={activeProduct}
@@ -149,8 +149,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         )}
       </div>
 
-      {/* Layer 2 (z-20): Carousel ring */}
-      <div className="absolute inset-0 z-20 pointer-events-none">
+      {/* Layer 2: Carousel ring (z-30) */}
+      <div className="absolute inset-0 z-30 pointer-events-none">
         <KineticCarousel 
           products={products}
           activeIndex={activeIndex}
