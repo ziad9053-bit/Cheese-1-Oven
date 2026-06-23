@@ -19,7 +19,8 @@ interface Product {
   image_url: string; category_id: number; product_type: string; is_available: boolean;
 }
 interface Category { id: number; name: string; slug: string; }
-type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'images';
+interface Sauce { id: string; name: string; image_url: string; price: number; is_available: boolean; }
+type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'sauces' | 'images';
 
 // ── Server upload (bypasses RLS) ──────────────────────────────────────────────
 async function serverUpload(blob: Blob, path: string): Promise<string | null> {
@@ -364,6 +365,102 @@ function CategoryForm({ initial, onSave, onCancel }: { initial?: Category; onSav
   );
 }
 
+// ── Sauce Form ─────────────────────────────────────────────────────────────
+function SauceForm({ initial, onSave, onCancel, onToast }: { initial?: Sauce; onSave: (s: Partial<Sauce>, blob?: Blob) => Promise<void>; onCancel: () => void; onToast: (m: string, t: 'ok'|'err') => void; }) {
+  const [form, setForm]           = useState<Partial<Sauce>>(initial ?? { name: '', image_url: '', price: 0, is_available: true });
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null);
+  const [preview, setPreview]     = useState(initial?.image_url ?? '');
+  const [showProc, setShowProc]   = useState(false);
+  const [saving, setSaving]       = useState(false);
+  const [uploadMode, setUploadMode] = useState<'url'|'file'>('url');
+
+  const set = (k: keyof Sauce, v: unknown) => setForm(f => ({ ...f, [k]: v }));
+
+  const handleProcessorDone = (blob: Blob, url: string) => { setImageBlob(blob); setPreview(url); setShowProc(false); };
+  const handleDirectFileUpload = async (f: File) => {
+    try {
+      const r = await toWebP(f, 400, 400, 88, true); // transparency check
+      setImageBlob(r.blob); setPreview(r.url);
+    } catch (e: any) {
+      if (e.message === 'SOLID_BG') onToast('❌ توقف! يجب رفع صورة "مُفرّغة" (بدون خلفية) لكي تظهر بشكل جميل فوق الواجهة!', 'err');
+      else onToast('حدث خطأ أثناء معالجة الصورة', 'err');
+    }
+  };
+
+  return (
+    <div className="bg-zinc-800/50 border border-white/10 rounded-2xl p-5 space-y-4">
+      <h3 className="font-black text-white text-base">{initial ? '✏️ تعديل الصوص' : '➕ صوص جديد'}</h3>
+      
+      <div className="grid grid-cols-2 gap-3">
+        <label className="space-y-1 block">
+          <span className="text-xs text-white/40">اسم الصوص</span>
+          <input value={form.name ?? ''} onChange={e => set('name', e.target.value)}
+            placeholder="مثال: رانش"
+            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-pink-500 text-sm"/>
+        </label>
+        <label className="space-y-1 block">
+          <span className="text-xs text-white/40">السعر (ر.س)</span>
+          <input type="number" value={form.price ?? 0} onChange={e => set('price', +e.target.value)}
+            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-pink-500 text-sm"/>
+        </label>
+      </div>
+
+      {/* ── Image ── */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-white/40">صورة الصوص (WEBP شفافة)</span>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setUploadMode('url')} className={`text-xs px-2.5 py-1 rounded-lg border transition-all ${uploadMode === 'url' ? 'border-pink-500 text-pink-300 bg-pink-950/50' : 'border-white/10 text-white/40'}`}>رابط URL</button>
+            <button type="button" onClick={() => setUploadMode('file')} className={`text-xs px-2.5 py-1 rounded-lg border transition-all ${uploadMode === 'file' ? 'border-pink-500 text-pink-300 bg-pink-950/50' : 'border-white/10 text-white/40'}`}>رفع صورة</button>
+          </div>
+        </div>
+
+        {uploadMode === 'url' ? (
+          <input value={form.image_url ?? ''} onChange={e => { set('image_url', e.target.value); setPreview(e.target.value); setImageBlob(null); }}
+            placeholder="https://... (الصق رابط الصورة)"
+            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-pink-500 text-sm"/>
+        ) : (
+          <div className="space-y-2">
+            <DirectFileInput onFile={handleDirectFileUpload}/>
+            <button type="button" onClick={() => setShowProc(!showProc)}
+              className="w-full flex items-center justify-center gap-2 text-xs text-pink-400 hover:text-pink-300 border border-pink-500/20 rounded-xl py-2 transition-colors">
+              <ImagePlus size={13}/> {showProc ? 'إخفاء المعالج' : 'استخدام معالج الصور'}
+            </button>
+            {showProc && <ImageProcessor onUse={handleProcessorDone} checkTrans={true} />}
+          </div>
+        )}
+
+        {preview && (
+          <div className="relative h-24 bg-black/30 rounded-xl border border-white/8 overflow-hidden flex justify-center p-2">
+            <img src={preview} alt="preview" className="h-full object-contain drop-shadow-xl"/>
+            {imageBlob && <div className="absolute top-2 left-2 bg-green-900/80 border border-green-500/40 text-green-300 text-[10px] px-2 py-0.5 rounded-full">جاهزة للرفع</div>}
+            <button type="button" onClick={() => { setPreview(''); setImageBlob(null); set('image_url', ''); }}
+              className="absolute top-2 right-2 bg-black/70 hover:bg-red-900/70 border border-white/10 rounded-full p-1 transition-colors">
+              <X size={13}/>
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={() => set('is_available', !form.is_available)}
+          className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${form.is_available ? 'bg-pink-600' : 'bg-white/10'}`}>
+          <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${form.is_available ? 'translate-x-5' : 'translate-x-0.5'}`}/>
+        </button>
+        <span className="text-sm text-white/60">{form.is_available ? '✅ يظهر للزبون' : '❌ مخفي'}</span>
+      </div>
+
+      <div className="flex gap-3 mt-4">
+        <button type="button" onClick={async () => { setSaving(true); await onSave(form, imageBlob ?? undefined); setSaving(false); }} disabled={saving}
+          className="flex-1 flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white py-2.5 rounded-xl font-bold text-sm transition-colors">
+          {saving ? <Loader2 size={14} className="animate-spin"/> : <Check size={14}/>} حفظ
+        </button>
+        <button type="button" onClick={onCancel} className="px-5 py-2.5 bg-white/5 hover:bg-white/10 text-white/60 rounded-xl font-bold text-sm border border-white/10 transition-colors">إلغاء</button>
+      </div>
+    </div>
+  );
+}
+
 // ── Background Manager ─────────────────────────────────────────────────────────
 function BackgroundManager({ onToast }: { onToast: (m: string, t: 'ok'|'err') => void }) {
   const [bgBlob, setBgBlob]       = useState<Blob | null>(null);
@@ -427,8 +524,8 @@ function BackgroundManager({ onToast }: { onToast: (m: string, t: 'ok'|'err') =>
 }
 
 // ── Main Admin Client ─────────────────────────────────────────────────────────
-export default function AdminClient({ initialProducts, initialCategories }: {
-  initialProducts: Product[]; initialCategories: Category[];
+export default function AdminClient({ initialProducts, initialCategories, initialSauces }: {
+  initialProducts: Product[]; initialCategories: Category[]; initialSauces: Sauce[];
 }) {
   const [section, setSection]           = useState<Section>('menu');
   const [products, setProducts]         = useState<Product[]>(initialProducts);
@@ -438,7 +535,10 @@ export default function AdminClient({ initialProducts, initialCategories }: {
   const [addProduct, setAddProduct]     = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
   const [addCategory, setAddCategory]   = useState(false);
-  const [confirmDel, setConfirmDel]     = useState<{ type: 'product'|'category'; id: number } | null>(null);
+  const [sauces, setSauces]             = useState<Sauce[]>(initialSauces);
+  const [editSauce, setEditSauce]       = useState<Sauce | null>(null);
+  const [addSauce, setAddSauce]         = useState(false);
+  const [confirmDel, setConfirmDel]     = useState<{ type: 'product'|'category'|'sauce'; id: any } | null>(null);
 
   const showToast = (msg: string, type: 'ok'|'err') => {
     setToast({ msg, type });
@@ -484,7 +584,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
       showToast('✅ تم التعديل', 'ok');
     } else {
       const { data: ins, error } = await supabase.from('categories').insert([data]).select().single();
-      if (error || !ins) return showToast('فشل الإضافة: ' + error?.message, 'err');
+      if (error || !ins) return showToast('فشل الإضافة', 'err');
       setCategories(cs => [...cs, ins as Category]);
       showToast('✅ تمت الإضافة', 'ok');
     }
@@ -498,10 +598,41 @@ export default function AdminClient({ initialProducts, initialCategories }: {
     showToast('تم الحذف', 'ok'); setConfirmDel(null);
   };
 
+  // ── Sauce CRUD ────────────────────────────────────────────────────────────
+  const saveSauce = async (data: Partial<Sauce>, blob?: Blob) => {
+    let imageUrl = data.image_url;
+    if (blob) {
+      const url = await serverUpload(blob, `images/sauces/${Date.now()}.webp`);
+      if (url) imageUrl = url;
+      else return showToast('فشل رفع الصورة — تأكد من صلاحيات Supabase Storage', 'err');
+    }
+    const payload = { ...data, image_url: imageUrl };
+    if (data.id) {
+      const { error } = await supabase.from('sauces').update(payload).eq('id', data.id);
+      if (error) return showToast('فشل التعديل: ' + error.message, 'err');
+      setSauces(ss => ss.map(s => s.id === data.id ? { ...s, ...payload } as Sauce : s));
+      showToast('✅ تم تعديل الصوص', 'ok');
+    } else {
+      const { data: ins, error } = await supabase.from('sauces').insert([payload]).select().single();
+      if (error || !ins) return showToast('فشل الإضافة: ' + error?.message, 'err');
+      setSauces(ss => [...ss, ins as Sauce]);
+      showToast('✅ تمت الإضافة', 'ok');
+    }
+    setEditSauce(null); setAddSauce(false);
+  };
+
+  const deleteSauce = async (id: string) => {
+    const { error } = await supabase.from('sauces').delete().eq('id', id);
+    if (error) return showToast('فشل الحذف', 'err');
+    setSauces(ss => ss.filter(s => s.id !== id));
+    showToast('تم الحذف', 'ok'); setConfirmDel(null);
+  };
+
   const stats = [
     { label: 'إجمالي المنتجات', value: products.length, color: 'text-pink-400' },
     { label: 'متاح للطلب', value: products.filter(p => p.is_available).length, color: 'text-green-400' },
     { label: 'الأصناف', value: categories.length, color: 'text-blue-400' },
+    { label: 'الصوصات', value: sauces.length, color: 'text-yellow-400' },
     { label: 'غير متاح', value: products.filter(p => !p.is_available).length, color: 'text-red-400' },
   ];
 
@@ -509,6 +640,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
     { id: 'dashboard' as Section, label: 'لوحة التحكم', icon: <LayoutDashboard size={17}/> },
     { id: 'products'  as Section, label: 'المنتجات',    icon: <Package size={17}/> },
     { id: 'categories'as Section, label: 'الأصناف',     icon: <Layers size={17}/> },
+    { id: 'sauces'    as Section, label: 'الصوصات',      icon: <img src="https://emojigraph.org/media/apple/drop-of-blood_1fa78.png" className="w-4 h-4 opacity-70 filter hue-rotate-90"/> },
     { id: 'images'    as Section, label: 'إدارة الصور', icon: <Image size={17}/> },
   ];
 
@@ -664,6 +796,44 @@ export default function AdminClient({ initialProducts, initialCategories }: {
             </div>
           )}
 
+          {/* SAUCES */}
+          {section === 'sauces' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-black">الصوصات ({sauces.length})</h2>
+                <button onClick={() => { setAddSauce(true); setEditSauce(null); }}
+                  className="flex items-center gap-2 bg-pink-600 hover:bg-pink-500 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors">
+                  <Plus size={15}/> إضافة صوص
+                </button>
+              </div>
+
+              {sauces.map(s => (
+                <div key={s.id} className="bg-zinc-900 border border-white/8 rounded-2xl p-4 flex items-center gap-3 hover:border-white/15 transition-colors">
+                  <div className="w-16 h-16 rounded-xl bg-black/50 flex items-center justify-center shrink-0 border border-white/10 p-1 relative">
+                    <img src={s.image_url} alt={s.name} className="w-full h-full object-contain"/>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-black text-white">{s.name}</p>
+                    <p className="text-xs text-white/40">{s.price} ر.س</p>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full mt-1 inline-block ${s.is_available ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                      {s.is_available ? '✅ مفعل (يظهر)' : '❌ مخفي'}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <button onClick={() => { setEditSauce(s); setAddSauce(false); }}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-900/40 hover:bg-blue-800/60 text-blue-200 text-xs font-bold border border-blue-500/30 transition-colors w-full justify-center">
+                      <Pencil size={13}/> تعديل
+                    </button>
+                    <button onClick={() => setConfirmDel({ type: 'sauce', id: s.id })}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-900/30 hover:bg-red-800/50 text-red-300 text-xs font-bold border border-red-500/20 transition-colors w-full justify-center">
+                      <Trash2 size={13}/> حذف
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* IMAGES */}
           {section === 'images' && (
             <div className="space-y-5">
@@ -693,6 +863,20 @@ export default function AdminClient({ initialProducts, initialCategories }: {
         </div>
       )}
 
+      {/* ── Sauce Add/Edit Modal ─────────────────────────────────────────── */}
+      {(addSauce || editSauce) && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-start justify-center p-4 overflow-y-auto">
+          <div className="w-full max-w-xl my-8">
+            <SauceForm
+              initial={editSauce ?? undefined}
+              onSave={saveSauce}
+              onCancel={() => { setAddSauce(false); setEditSauce(null); }}
+              onToast={showToast}
+            />
+          </div>
+        </div>
+      )}
+
       {/* ── Delete confirm ────────────────────────────────────────────────────── */}
       {confirmDel && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
@@ -700,7 +884,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
             <h3 className="font-black text-white">تأكيد الحذف</h3>
             <p className="text-white/50 text-sm">هل أنت متأكد؟ لا يمكن التراجع.</p>
             <div className="flex gap-3">
-              <button onClick={() => confirmDel.type === 'product' ? deleteProduct(confirmDel.id) : deleteCategory(confirmDel.id)}
+              <button onClick={() => confirmDel.type === 'product' ? deleteProduct(confirmDel.id) : confirmDel.type === 'category' ? deleteCategory(confirmDel.id) : deleteSauce(confirmDel.id)}
                 className="flex-1 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-bold text-sm transition-colors">
                 <Trash2 size={14}/> حذف
               </button>

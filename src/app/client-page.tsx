@@ -165,6 +165,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       {/* Sauce Selector Navigation Bar */}
       {activeProduct?.category_id === 1 && (
         <SauceSelector 
+          sauces={sauces}
           selectedSauce={selectedSauceId}
           onSelectSauce={setSelectedSauceId}
         />

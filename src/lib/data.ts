@@ -18,8 +18,9 @@ export interface Category {
 export interface Sauce {
   id: string;
   name: string;
-  color: string;
+  image_url: string;
   price: number;
+  is_available: boolean;
 }
 
 export interface Drink {
