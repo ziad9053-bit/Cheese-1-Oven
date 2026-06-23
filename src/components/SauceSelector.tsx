@@ -55,8 +55,8 @@ export default function SauceSelector({ sauces, selectedSauce, onSelectSauce, on
               <span 
                 className={`text-[12px] md:text-[14px] font-black tracking-wide text-center leading-tight transition-all duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]`}
                 style={{
-                  color: '#FF6347',
-                  WebkitTextStroke: '1px white'
+                  color: 'white',
+                  WebkitTextStroke: '1px #FF6347'
                 }}
               >
                 {selectedSauce === sauce.id ? sauce.name : 'صوص'}
