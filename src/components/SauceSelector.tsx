@@ -19,11 +19,18 @@ export default function SauceSelector({ sauces, selectedSauce, onSelectSauce }: 
             onClick={() => onSelectSauce(selectedSauce === sauce.id ? null : sauce.id)}
             className={`flex flex-col items-center gap-1.5 transition-all duration-300 w-16 md:w-20 ${
               selectedSauce === sauce.id 
-                ? 'scale-125 -translate-y-2' 
-                : 'opacity-70 hover:opacity-100 hover:scale-110 hover:-translate-y-1'
+                ? 'scale-110 -translate-y-2' 
+                : 'opacity-70 hover:opacity-100 hover:scale-105 hover:-translate-y-1'
             }`}
           >
-            <div className={`transform transition-transform duration-300 relative w-14 h-14 md:w-20 md:h-20 ${selectedSauce === sauce.id ? 'drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]' : 'drop-shadow-xl'}`}>
+            <div 
+              className="relative w-14 h-14 md:w-20 md:h-20"
+              style={{
+                transition: 'transform .25s ease',
+                filter: 'drop-shadow(0 8px 18px rgba(0,0,0,.25))',
+                transform: selectedSauce === sauce.id ? 'scale(1.08) rotate(-4deg)' : 'scale(1) rotate(0deg)'
+              }}
+            >
               <img 
                 src={sauce.image_url} 
                 alt={sauce.name}
