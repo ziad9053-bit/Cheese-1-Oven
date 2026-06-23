@@ -9,7 +9,7 @@ interface CartItem {
   id: string;
   product: Product;
   quantity: number;
-  selectedSauceIds: string[];
+  selectedSauceIds: number[];
 }
 
 interface DrinkCartItem {

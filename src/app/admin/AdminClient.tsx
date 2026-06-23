@@ -19,7 +19,7 @@ interface Product {
   image_url: string; category_id: number; product_type: string; is_available: boolean;
 }
 interface Category { id: number; name: string; slug: string; }
-interface Sauce { id: string; name: string; image_url: string; price: number; is_available: boolean; }
+interface Sauce { id: number; name: string; description?: string; image_url: string; price: number; is_available: boolean; category_id?: number; product_type?: string; }
 type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'sauces' | 'images';
 
 // ── Server upload (bypasses RLS) ──────────────────────────────────────────────
@@ -524,18 +524,18 @@ function BackgroundManager({ onToast }: { onToast: (m: string, t: 'ok'|'err') =>
 }
 
 // ── Main Admin Client ─────────────────────────────────────────────────────────
-export default function AdminClient({ initialProducts, initialCategories, initialSauces }: {
-  initialProducts: Product[]; initialCategories: Category[]; initialSauces: Sauce[];
+export default function AdminClient({ initialProducts, initialCategories }: {
+  initialProducts: Product[]; initialCategories: Category[];
 }) {
   const [section, setSection]           = useState<Section>('menu');
-  const [products, setProducts]         = useState<Product[]>(initialProducts);
+  const [products, setProducts]         = useState<Product[]>(initialProducts.filter(p => p.product_type !== 'sauce'));
   const [categories, setCategories]     = useState<Category[]>(initialCategories);
   const [toast, setToast]               = useState<{ msg: string; type: 'ok'|'err' } | null>(null);
   const [editProduct, setEditProduct]   = useState<Product | null>(null);
   const [addProduct, setAddProduct]     = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
   const [addCategory, setAddCategory]   = useState(false);
-  const [sauces, setSauces]             = useState<Sauce[]>(initialSauces);
+  const [sauces, setSauces]             = useState<Sauce[]>(initialProducts.filter(p => p.product_type === 'sauce'));
   const [editSauce, setEditSauce]       = useState<Sauce | null>(null);
   const [addSauce, setAddSauce]         = useState(false);
   const [confirmDel, setConfirmDel]     = useState<{ type: 'product'|'category'|'sauce'; id: any } | null>(null);
@@ -606,23 +606,33 @@ export default function AdminClient({ initialProducts, initialCategories, initia
       if (url) imageUrl = url;
       else return showToast('فشل رفع الصورة — تأكد من صلاحيات Supabase Storage', 'err');
     }
-    const payload = { ...data, image_url: imageUrl };
+    const payload = { 
+      ...data, 
+      image_url: imageUrl, 
+      product_type: 'sauce',
+      category_id: categories[0]?.id ?? 1,
+      description: data.description ?? '' 
+    };
+    
     if (data.id) {
-      const { error } = await supabase.from('sauces').update(payload).eq('id', data.id);
+      const { error } = await supabase.from('products').update(payload).eq('id', data.id);
       if (error) return showToast('فشل التعديل: ' + error.message, 'err');
+      // Update both sauces and products state to keep them in sync
+      setProducts(ps => ps.map(p => p.id === data.id ? { ...p, ...payload } as Product : p));
       setSauces(ss => ss.map(s => s.id === data.id ? { ...s, ...payload } as Sauce : s));
       showToast('✅ تم تعديل الصوص', 'ok');
     } else {
-      const { data: ins, error } = await supabase.from('sauces').insert([payload]).select().single();
+      const { data: ins, error } = await supabase.from('products').insert([payload]).select().single();
       if (error || !ins) return showToast('فشل الإضافة: ' + error?.message, 'err');
+      setProducts(ps => [...ps, ins as Product]);
       setSauces(ss => [...ss, ins as Sauce]);
       showToast('✅ تمت الإضافة', 'ok');
     }
     setEditSauce(null); setAddSauce(false);
   };
 
-  const deleteSauce = async (id: string) => {
-    const { error } = await supabase.from('sauces').delete().eq('id', id);
+  const deleteSauce = async (id: number) => {
+    const { error } = await supabase.from('products').delete().eq('id', id);
     if (error) return showToast('فشل الحذف', 'err');
     setSauces(ss => ss.filter(s => s.id !== id));
     showToast('تم الحذف', 'ok'); setConfirmDel(null);

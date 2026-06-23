@@ -5,8 +5,8 @@ import { Sauce } from '@/lib/data';
 
 interface Props {
   sauces: Sauce[];
-  selectedSauce: string | null;
-  onSelectSauce: (id: string | null) => void;
+  selectedSauce: number | null;
+  onSelectSauce: (id: number | null) => void;
 }
 
 export default function SauceSelector({ sauces, selectedSauce, onSelectSauce }: Props) {

@@ -21,7 +21,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [drinkItems, setDrinkItems] = useState<any[]>([]);
-  const [selectedSauceId, setSelectedSauceId] = useState<string | null>(null);
+  const [selectedSauceId, setSelectedSauceId] = useState<number | null>(null);
 
   const activeProduct = products[activeIndex];
   const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pastry.jpg';

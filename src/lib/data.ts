@@ -16,10 +16,13 @@ export interface Category {
 }
 
 export interface Sauce {
-  id: string;
+  id: number;
   name: string;
-  image_url: string;
+  description?: string;
   price: number;
+  image_url: string;
+  category_id?: number;
+  product_type?: string;
   is_available: boolean;
 }
 
