@@ -11,8 +11,8 @@ interface Props {
 
 export default function SauceSelector({ sauces, selectedSauce, onSelectSauce }: Props) {
   return (
-    <div className="fixed bottom-6 right-16 md:right-24 z-40 flex items-end">
-      <div className="flex items-end -space-x-3 space-x-reverse md:-space-x-5">
+    <div className="fixed top-8 left-1/2 -translate-x-1/2 z-40 flex items-start">
+      <div className="flex items-start -space-x-3 space-x-reverse md:-space-x-5">
         {sauces.filter(s => s.is_available).map((sauce) => (
           <button
             key={sauce.id}
