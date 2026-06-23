@@ -1033,7 +1033,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
                       <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, #ffffff11 1px, transparent 1px)', backgroundSize: '10px 10px' }}/>
                       {currentSettings.isVisible ? (
                         <h1 
-                          className="text-5xl md:text-6xl text-center whitespace-nowrap drop-shadow-2xl"
+                          className="text-4xl md:text-5xl text-center whitespace-normal leading-none px-4 break-words drop-shadow-2xl"
                           style={{
                             fontFamily: currentSettings.font,
                             color: currentSettings.innerColor,

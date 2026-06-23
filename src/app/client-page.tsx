@@ -222,7 +222,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
           return (
             <div className="absolute top-2 md:-top-4 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none z-30">
               <h1 
-                className="text-[90px] md:text-[140px] text-center whitespace-nowrap drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]"
+                className="w-full px-4 text-center whitespace-normal break-words leading-[0.85] text-[18vw] sm:text-[14vw] md:text-[10vw] drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]"
                 style={{
                   fontFamily: settings.font,
                   color: settings.innerColor,
