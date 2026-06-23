@@ -131,25 +131,24 @@
 
 @keyframes sauceIdle {
   0%, 100% {
-    /* Permanent Neon Cyan Edge Contour */
-    filter: drop-shadow(0 0 1px #00f3ff) drop-shadow(0 0 2px #00f3ff) drop-shadow(0 0 8px #00f3ff);
+    /* Normal drop shadow */
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.4));
     transform: scale(1) rotate(40deg);
   }
   50% {
-    filter: drop-shadow(0 0 1px #00f3ff) drop-shadow(0 0 3px #00f3ff) drop-shadow(0 0 12px #00f3ff) drop-shadow(0 10px 15px rgba(0, 243, 255, 0.4));
+    filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.3));
     transform: scale(1.03) rotate(38deg);
   }
 }
 
 @keyframes sauceActive {
   0%, 100% {
-    /* Neon Cyan Edge Contour */
-    filter: drop-shadow(0 0 1px #00f3ff) drop-shadow(0 0 3px #00f3ff) drop-shadow(0 0 15px #00f3ff) drop-shadow(0 15px 20px rgba(0, 243, 255, 0.4));
+    /* Normal deeper drop shadow for active */
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
     transform: scale(1.08) rotate(40deg);
   }
   50% {
-    /* Stronger Neon Pulse */
-    filter: drop-shadow(0 0 2px #00f3ff) drop-shadow(0 0 5px #00f3ff) drop-shadow(0 0 25px #00f3ff) drop-shadow(0 30px 25px rgba(0, 243, 255, 0.8));
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.4));
     transform: scale(1.15) rotate(42deg);
   }
 }
