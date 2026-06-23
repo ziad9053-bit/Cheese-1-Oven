@@ -128,3 +128,33 @@
     @apply font-sans;
   }
 }
+
+@keyframes sauceIdle {
+  0%, 100% {
+    filter: drop-shadow(0 10px 15px rgba(250, 204, 21, 0.2));
+    transform: scale(1) rotate(20deg);
+  }
+  50% {
+    filter: drop-shadow(0 25px 20px rgba(250, 204, 21, 0.5));
+    transform: scale(1.03) rotate(18deg);
+  }
+}
+
+@keyframes sauceActive {
+  0%, 100% {
+    filter: drop-shadow(0 15px 20px rgba(250, 204, 21, 0.7));
+    transform: scale(1.08) rotate(20deg);
+  }
+  50% {
+    /* Glow strongly downwards with a bright yellow color */
+    filter: drop-shadow(0 35px 25px rgba(250, 204, 21, 1));
+    transform: scale(1.15) rotate(22deg);
+  }
+}
+
+.sauce-idle {
+  animation: sauceIdle 3s infinite ease-in-out;
+}
+.sauce-active {
+  animation: sauceActive 2s infinite ease-in-out;
+}
