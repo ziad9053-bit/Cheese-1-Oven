@@ -41,7 +41,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
     cartTimer.current = setTimeout(() => setCartPulse(false), 400);
   };
 
-  const activeProduct = products[activeIndex];
+  const displayProducts = products.filter(p => p.product_type !== 'brand_settings');
+  const activeProduct = displayProducts[activeIndex];
   const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pastry.jpg';
 
   const [loadedBg, setLoadedBg] = useState<string>(bgImageUrl);
@@ -174,7 +175,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       {/* Layer 2: Carousel ring (z-30) */}
       <div className="absolute inset-0 z-30 pointer-events-none">
         <KineticCarousel 
-          products={products}
+          products={displayProducts}
           activeIndex={activeIndex}
           onIndexChange={setActiveIndex}
           cartProductIds={cartItems.map(item => item.product.id)}
