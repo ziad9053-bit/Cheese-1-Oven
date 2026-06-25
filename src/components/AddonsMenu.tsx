@@ -121,8 +121,8 @@ export default function AddonsMenu({
                   }`}
                 >
                   <span 
-                    className="font-black text-sm md:text-base text-white whitespace-nowrap drop-shadow-md tracking-wide"
-                    style={{ WebkitTextStroke: '1px #ff6347', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+                    className="font-black text-sm md:text-base text-[#ff6347] whitespace-nowrap drop-shadow-md tracking-wide"
+                    style={{ WebkitTextStroke: '1px white', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     {item.name.replace(/^(صوص|سلطة|مشروب)\s+/g, '')}
                   </span>

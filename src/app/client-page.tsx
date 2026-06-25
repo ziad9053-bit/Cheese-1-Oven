@@ -78,7 +78,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   };
 
   const salads = products.filter(p => p.product_type === 'salad');
-  const allDrinks = [...drinks, ...products.filter(p => p.product_type === 'drink')];
+  const allDrinks = products.filter(p => p.product_type === 'drink');
 
   const handleAddAddonToCart = (item: any, type: 'sauce' | 'salad' | 'drink') => {
     if (type === 'drink') {
