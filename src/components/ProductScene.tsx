@@ -73,7 +73,7 @@ export const ProductScene: React.FC<Props> = ({
             <img
               src={product?.image_url || ''}
               alt={product?.name || ''}
-              className="absolute inset-0 w-full h-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.8)] rounded-full"
+              className="absolute inset-0 w-full h-full object-contain rounded-full"
             />
             
             {/* SAUCE EFFECT LAYER OVER PIZZA */}
@@ -83,7 +83,7 @@ export const ProductScene: React.FC<Props> = ({
                   key={`sauce-effect-${selectedSauce.id}`}
                   src={selectedSauce.description}
                   alt="Sauce Effect"
-                  className="absolute inset-0 w-full h-full object-contain drop-shadow-xl"
+                  className="absolute inset-0 w-full h-full object-contain"
                   initial={{ opacity: 0, scale: 0.75 }}
                   animate={{ opacity: 1, scale: 0.85 }}
                   exit={{ opacity: 0, scale: 0.95 }}
