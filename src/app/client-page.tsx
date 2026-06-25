@@ -210,10 +210,10 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       {/* Floating Cart Button */}
       <button
         onClick={() => setIsSheetOpen(true)}
-        className={`fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[60] text-white p-3.5 md:p-4 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.6)] flex items-center justify-center border-2 border-white cursor-pointer transition-all duration-300 ${
+        className={`fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[60] text-white p-3.5 md:p-4 rounded-full flex items-center justify-center border border-white/30 backdrop-blur-xl cursor-pointer transition-all duration-300 ${
           cartPulse 
-            ? 'scale-125 bg-green-400 shadow-[0_0_40px_rgba(34,197,94,1)]' 
-            : 'hover:scale-110 active:scale-95 bg-green-500'
+            ? 'scale-125 bg-green-500/80 shadow-[0_0_40px_rgba(34,197,94,1)]' 
+            : 'hover:scale-110 active:scale-95 bg-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.3)]'
         }`}
       >
         <ShoppingCart className="w-6 h-6 md:w-7 md:h-7" />

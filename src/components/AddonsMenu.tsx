@@ -76,7 +76,7 @@ export default function AddonsMenu({
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className="flex items-center gap-1.5 md:gap-2 bg-black/70 backdrop-blur-md border border-white/20 text-white px-3 md:px-5 py-2.5 md:py-3 rounded-full shadow-2xl hover:bg-black/90 transition-all hover:scale-105 active:scale-95"
+                className="flex items-center gap-1.5 md:gap-2 bg-white/15 backdrop-blur-xl border border-white/30 text-white px-3 md:px-5 py-2.5 md:py-3 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:bg-white/25 transition-all hover:scale-105 active:scale-95"
               >
                 {renderCategoryIcon(cat)}
                 <span className="font-bold text-xs md:text-sm">
@@ -91,7 +91,7 @@ export default function AddonsMenu({
             initial={{ opacity: 0, scale: 0.9, x: 20 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
-            className="flex items-center gap-2 md:gap-4 bg-black/60 backdrop-blur-xl border border-white/10 p-2 rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.5)] w-max max-w-full"
+            className="flex items-center gap-2 md:gap-4 bg-white/15 backdrop-blur-xl border border-white/30 p-2 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.3)] w-max max-w-full"
           >
             {/* Back Arrow */}
             <button 
