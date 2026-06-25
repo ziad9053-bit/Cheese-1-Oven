@@ -168,7 +168,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       </div>
       
       {/* Layer 1: Central product scene */}
-      <div className="absolute inset-0 z-40 pointer-events-none">
+      <div className={`absolute inset-0 z-40 pointer-events-none ${isSheetOpen ? 'hidden' : ''}`}>
         {activeProduct ? (
           <ProductScene 
             product={activeProduct}
@@ -186,7 +186,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       </div>
 
       {/* Layer 2: Carousel ring (z-30) */}
-      <div className="absolute inset-0 z-30 pointer-events-none">
+      <div className={`absolute inset-0 z-30 pointer-events-none ${isSheetOpen ? 'hidden' : ''}`}>
         <KineticCarousel 
           products={displayProducts}
           activeIndex={activeIndex}

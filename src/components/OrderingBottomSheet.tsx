@@ -76,28 +76,18 @@ export const OrderingBottomSheet: React.FC<Props> = ({
   const recommendedDrink = getRecommendedDrink();
 
   return (
-    <>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-          />
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        initial={{ y: "100%" }}
-        animate={{ y: isOpen ? 0 : "100%" }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed bottom-0 left-0 right-0 h-[85vh] bg-zinc-950 border-t border-white/10 rounded-t-[32px] z-50 flex flex-col overflow-hidden"
-      >
-        {/* Header section with explicit back button */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-20">
-          <button 
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", damping: 30, stiffness: 250 }}
+          className="fixed inset-0 bg-zinc-950 z-[100] flex flex-col overflow-hidden"
+        >
+          {/* Header section with explicit back button */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-950/90 backdrop-blur-md sticky top-0 z-20">
+            <button 
             onClick={onClose}
             className="flex items-center gap-2 text-white/70 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
           >
@@ -258,8 +248,9 @@ export const OrderingBottomSheet: React.FC<Props> = ({
             <CreditCard className="w-6 h-6" />
             إتمام الطلب
           </button>
-        </div>
-      </motion.div>
-    </>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
