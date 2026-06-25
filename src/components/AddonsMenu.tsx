@@ -120,11 +120,17 @@ export default function AddonsMenu({
                       : 'bg-black/40 border-white/20 hover:bg-black/60 hover:scale-105 z-10'
                   }`}
                 >
-                  <span className="font-bold text-xs md:text-sm text-white whitespace-nowrap drop-shadow-md">
-                    {item.name}
+                  <span 
+                    className="font-black text-sm md:text-base text-white whitespace-nowrap drop-shadow-md tracking-wide"
+                    style={{ WebkitTextStroke: '1px #ff6347', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
+                  >
+                    {item.name.replace(/^(صوص|سلطة|مشروب)\s+/g, '')}
                   </span>
-                  <span className="text-[10px] text-white/80 whitespace-nowrap drop-shadow-md">
-                    {item.price} د.ع
+                  <span 
+                    className="font-black text-[11px] md:text-xs text-white whitespace-nowrap drop-shadow-md"
+                    style={{ WebkitTextStroke: '0.5px #ff6347', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
+                  >
+                    {item.price} ريال
                   </span>
                   {isSelected && (
                     <div 

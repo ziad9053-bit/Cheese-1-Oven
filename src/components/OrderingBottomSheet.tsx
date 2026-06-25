@@ -167,7 +167,7 @@ export const OrderingBottomSheet: React.FC<Props> = ({
 
                         <div className="flex items-center justify-between mt-3">
                           <span className="text-primary font-black text-lg">
-                            {(item.product.price + item.selectedSauceIds.reduce((sum, id) => sum + (sauces.find(s => s.id === id)?.price || 0), 0)) * item.quantity} ر.س
+                            {(item.product.price + item.selectedSauceIds.reduce((sum, id) => sum + (sauces.find(s => s.id === id)?.price || 0), 0)) * item.quantity} ريال
                           </span>
                           
                           <div className="flex items-center gap-3 bg-black/40 rounded-full px-1 py-1 border border-white/10">
@@ -215,7 +215,7 @@ export const OrderingBottomSheet: React.FC<Props> = ({
 
                         <div className="flex items-center justify-between mt-3">
                           <span className="text-blue-400 font-black text-lg">
-                            {item.drink.price * item.quantity} ر.س
+                            {item.drink.price * item.quantity} ريال
                           </span>
                           
                           <div className="flex items-center gap-3 bg-black/40 rounded-full px-1 py-1 border border-white/10">
@@ -260,7 +260,7 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                       <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-xl">🥤</div>
                       <div>
                         <p className="text-white font-bold">{recommendedDrink.name}</p>
-                        <p className="text-blue-300 text-sm">{recommendedDrink.price} ر.س</p>
+                        <p className="text-blue-300 text-sm">{recommendedDrink.price} ريال</p>
                       </div>
                     </div>
                     <button 

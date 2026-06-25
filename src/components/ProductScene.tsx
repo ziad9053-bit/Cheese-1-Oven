@@ -188,7 +188,7 @@ export const ProductScene: React.FC<Props> = ({
               className="px-2 py-1 flex items-center justify-center drop-shadow-xl"
             >
               <span className="text-xl md:text-3xl font-black text-pink-500 whitespace-nowrap drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)] [text-shadow:_-1.5px_-1.5px_0_#FFF,_1.5px_-1.5px_0_#FFF,_-1.5px_1.5px_0_#FFF,_1.5px_1.5px_0_#FFF]">
-                {product.price} ر.س
+                {product.price} ريال
               </span>
             </motion.div>
           </AnimatePresence>
