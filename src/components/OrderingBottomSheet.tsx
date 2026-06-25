@@ -132,7 +132,6 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                   {cartItems.map((item) => (
                     <motion.div
                       key={item.id}
-                      layout
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9, x: -20 }}
@@ -193,7 +192,6 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                   {drinkCartItems.map((item) => (
                     <motion.div
                       key={item.id}
-                      layout
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9, x: -20 }}
