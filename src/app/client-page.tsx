@@ -166,34 +166,40 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         </AnimatePresence>
         <div className="absolute inset-0 bg-black/40 z-0" />
       </div>
-      
-      {/* Layer 1: Central product scene */}
-      <div className={`absolute inset-0 z-40 pointer-events-none ${isSheetOpen ? 'hidden' : ''}`}>
-        {activeProduct ? (
-          <ProductScene 
-            product={activeProduct}
-            onAddClick={handleAddProduct}
-            bgImageUrl={bgImageUrl}
-            selectedSauce={sauces.find(s => s.id === selectedSauceId) || null}
-            selectedSalad={salads.find(s => s.id === selectedSaladId) || null}
-            selectedDrink={allDrinks.find(d => d.id === selectedDrinkId) || null}
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full pointer-events-auto">
-            <p>لا توجد منتجات حالياً</p>
-          </div>
-        )}
-      </div>
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        transition={{ duration: 1, delay: 0.2 }}
+        className="absolute inset-0 pointer-events-none"
+      >
+        {/* Layer 1: Central product scene */}
+        <div className={`absolute inset-0 z-40 pointer-events-none ${isSheetOpen ? 'hidden' : ''}`}>
+          {activeProduct ? (
+            <ProductScene 
+              product={activeProduct}
+              onAddClick={handleAddProduct}
+              bgImageUrl={bgImageUrl}
+              selectedSauce={sauces.find(s => s.id === selectedSauceId) || null}
+              selectedSalad={salads.find(s => s.id === selectedSaladId) || null}
+              selectedDrink={allDrinks.find(d => d.id === selectedDrinkId) || null}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full pointer-events-auto">
+              <p>لا توجد منتجات حالياً</p>
+            </div>
+          )}
+        </div>
 
-      {/* Layer 2: Carousel ring (z-30) */}
-      <div className={`absolute inset-0 z-30 pointer-events-none ${isSheetOpen ? 'hidden' : ''}`}>
-        <KineticCarousel 
-          products={displayProducts}
-          activeIndex={activeIndex}
-          onIndexChange={setActiveIndex}
-          cartProductIds={cartItems.map(item => item.product.id)}
-        />
-      </div>
+        {/* Layer 2: Carousel ring (z-30) */}
+        <div className={`absolute inset-0 z-30 pointer-events-none ${isSheetOpen ? 'hidden' : ''}`}>
+          <KineticCarousel 
+            products={displayProducts}
+            activeIndex={activeIndex}
+            onIndexChange={setActiveIndex}
+            cartProductIds={cartItems.map(item => item.product.id)}
+          />
+        </div>
+      </motion.div>
 
       {/* Toast Notification */}
       <AnimatePresence>
