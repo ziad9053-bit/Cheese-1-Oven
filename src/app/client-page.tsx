@@ -207,24 +207,6 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Floating Cart Button */}
-      <button
-        onClick={() => setIsSheetOpen(true)}
-        className={`fixed bottom-6 left-6 md:bottom-10 md:left-10 z-[60] text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full flex items-center justify-center gap-2 border border-white/30 backdrop-blur-xl cursor-pointer transition-all duration-300 min-w-[70px] md:min-w-[90px] ${
-          cartPulse 
-            ? 'scale-110 bg-green-500/80 shadow-[0_0_40px_rgba(34,197,94,1)]' 
-            : 'hover:scale-105 active:scale-95 bg-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.3)]'
-        }`}
-      >
-        <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
-        <span className="font-bold text-xs md:text-sm">السلة</span>
-        {totalItems > 0 && (
-          <div className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs md:text-sm font-black w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-full border-2 border-black drop-shadow-md">
-            {totalItems}
-          </div>
-        )}
-      </button>
-
       {/* Brand Identity / Logo */}
       {(() => {
         const settingsProd = products.find(p => p.product_type === 'brand_settings');
@@ -249,21 +231,46 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         } catch(e) { return null; }
       })()}
 
-      {/* Addons Menu (Sauces, Salads, Drinks) */}
-      {activeProduct?.category_id === 1 && (
-        <AddonsMenu 
-          sauces={sauces}
-          salads={salads}
-          drinks={allDrinks}
-          selectedSauce={selectedSauceId}
-          onSelectSauce={setSelectedSauceId}
-          selectedSalad={selectedSaladId}
-          onSelectSalad={setSelectedSaladId}
-          selectedDrink={selectedDrinkId}
-          onSelectDrink={setSelectedDrinkId}
-          onAddToCart={handleAddAddonToCart}
-        />
-      )}
+      {/* Bottom Bar Container */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-4xl px-4 md:bottom-10 z-[60] flex items-end justify-between pointer-events-none" dir="rtl">
+        {/* Right side: Addons Menu */}
+        <div className="pointer-events-auto flex justify-end shrink min-w-0 overflow-visible">
+          {activeProduct?.category_id === 1 && (
+            <AddonsMenu 
+              sauces={sauces}
+              salads={salads}
+              drinks={allDrinks}
+              selectedSauce={selectedSauceId}
+              onSelectSauce={setSelectedSauceId}
+              selectedSalad={selectedSaladId}
+              onSelectSalad={setSelectedSaladId}
+              selectedDrink={selectedDrinkId}
+              onSelectDrink={setSelectedDrinkId}
+              onAddToCart={handleAddAddonToCart}
+            />
+          )}
+        </div>
+
+        {/* Left side: Cart Button */}
+        <div className="pointer-events-auto shrink-0 z-[65]">
+          <button
+            onClick={() => setIsSheetOpen(true)}
+            className={`text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full flex items-center justify-center gap-2 border border-white/30 backdrop-blur-xl cursor-pointer transition-all duration-300 min-w-[70px] md:min-w-[90px] ${
+              cartPulse 
+                ? 'scale-110 bg-green-500/80 shadow-[0_0_40px_rgba(34,197,94,1)]' 
+                : 'hover:scale-105 active:scale-95 bg-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.3)]'
+            }`}
+          >
+            <ShoppingCart className="w-5 h-5 md:w-6 md:h-6" />
+            <span className="font-bold text-xs md:text-sm">السلة</span>
+            {totalItems > 0 && (
+              <div className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs md:text-sm font-black w-6 h-6 md:w-7 md:h-7 flex items-center justify-center rounded-full border-2 border-black drop-shadow-md">
+                {totalItems}
+              </div>
+            )}
+          </button>
+        </div>
+      </div>
 
       <OrderingBottomSheet 
         isOpen={isSheetOpen}
