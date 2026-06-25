@@ -76,9 +76,8 @@ export default function AddonsMenu({
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className="flex items-center gap-1.5 md:gap-2 bg-white/15 backdrop-blur-xl border border-white/30 text-white px-3 md:px-5 py-2.5 md:py-3 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:bg-white/25 transition-all hover:scale-105 active:scale-95"
+                className="flex items-center justify-center bg-white/15 backdrop-blur-xl border border-white/30 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:bg-white/25 transition-all hover:scale-105 active:scale-95 min-w-[70px] md:min-w-[90px]"
               >
-                {renderCategoryIcon(cat)}
                 <span className="font-bold text-xs md:text-sm">
                   {cat === 'sauces' ? 'صوصات' : cat === 'salads' ? 'سلطات' : 'مشروبات'}
                 </span>
