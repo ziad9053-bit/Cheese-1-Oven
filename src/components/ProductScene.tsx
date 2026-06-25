@@ -64,7 +64,7 @@ export const ProductScene: React.FC<Props> = ({
           {/* We wrap the pizza and the sauce effect in one motion container so they animate in together when product changes */}
           <motion.div
             key={product?.id}
-            className="relative w-[200px] h-[200px] md:w-[320px] md:h-[320px]"
+            className="absolute inset-0 m-auto w-[200px] h-[200px] md:w-[320px] md:h-[320px]"
             initial={{ scale: 0.2, opacity: 0, rotate: -30 }}
             animate={{ scale: 1, opacity: 1, rotate: 0 }}
             exit={{ scale: 1.4, opacity: 0, rotate: 15 }}
