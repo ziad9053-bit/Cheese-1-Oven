@@ -93,7 +93,7 @@ export const ProductScene: React.FC<Props> = ({
             </AnimatePresence>
 
             {/* SALAD EFFECT OVER PIZZA (Top-Right) */}
-            <div className="absolute -top-[10%] -right-[5%] w-[55%] h-[55%] z-[60] drop-shadow-2xl pointer-events-none">
+            <div className="absolute -top-[10%] -right-[5%] w-[45%] h-[45%] z-[60] drop-shadow-2xl pointer-events-none">
               <AnimatePresence>
                 {selectedSalad && (
                   <motion.img
