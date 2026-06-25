@@ -19,9 +19,18 @@ export default function KitchenPage() {
         .in('status', ['pending', 'preparing'])
         .order('created_at', { ascending: true });
         
-      if (data && !error) setOrders(data);
+      if (data && !error) {
+        // Only update if there's an actual change to prevent UI flickering
+        setOrders(prev => {
+          if (JSON.stringify(prev) !== JSON.stringify(data)) return data;
+          return prev;
+        });
+      }
     };
     fetchOrders();
+
+    // Hidden background refresh every 10 seconds
+    const intervalId = setInterval(fetchOrders, 10000);
 
     // Subscribe to realtime updates
     const sub = supabase.channel('kitchen_orders')
@@ -46,6 +55,7 @@ export default function KitchenPage() {
       .subscribe();
 
     return () => {
+      clearInterval(intervalId);
       supabase.removeChannel(sub);
     };
   }, [selectedOrder]);

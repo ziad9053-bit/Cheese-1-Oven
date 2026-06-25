@@ -19,9 +19,18 @@ export default function DriverPage() {
         .in('status', ['ready', 'out_for_delivery'])
         .order('created_at', { ascending: true });
         
-      if (data && !error) setOrders(data);
+      if (data && !error) {
+        // Only update if there's an actual change to prevent UI flickering
+        setOrders(prev => {
+          if (JSON.stringify(prev) !== JSON.stringify(data)) return data;
+          return prev;
+        });
+      }
     };
     fetchOrders();
+
+    // Hidden background refresh every 10 seconds
+    const intervalId = setInterval(fetchOrders, 10000);
 
     const sub = supabase.channel('driver_orders')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: 'order_type=eq.delivery' }, (payload) => {
@@ -43,6 +52,7 @@ export default function DriverPage() {
       .subscribe();
 
     return () => {
+      clearInterval(intervalId);
       supabase.removeChannel(sub);
     };
   }, [selectedOrder]);
