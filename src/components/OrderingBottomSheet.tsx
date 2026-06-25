@@ -241,38 +241,7 @@ export const OrderingBottomSheet: React.FC<Props> = ({
               )}
             </AnimatePresence>
 
-            {cartItems.length > 0 && recommendedDrink && !drinkCartItems.some(d => d.drink.id === recommendedDrink.id) && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border border-blue-500/30 relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full" />
-                
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-blue-400" />
-                    <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">اقتراح الذكاء الاصطناعي</span>
-                  </div>
-                  <h4 className="text-white font-bold mb-1">ما يكمل طلبك بدون مشروب بارد؟</h4>
-                  <div className="flex items-center justify-between mt-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-xl">🥤</div>
-                      <div>
-                        <p className="text-white font-bold">{recommendedDrink.name}</p>
-                        <p className="text-blue-300 text-sm">{recommendedDrink.price} ريال</p>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => onAddDrink(recommendedDrink)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-full font-bold transition-colors shadow-[0_0_15px_rgba(59,130,246,0.4)]"
-                    >
-                      إضافة
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+
 
           </div>
         </div>
