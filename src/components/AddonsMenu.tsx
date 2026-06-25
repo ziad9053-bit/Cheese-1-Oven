@@ -114,20 +114,20 @@ export default function AddonsMenu({
                 <button
                   key={item.id}
                   onClick={() => onSelect(activeCategory, isSelected ? null : item.id)}
-                  className={`relative flex flex-col items-center justify-center min-w-[90px] md:min-w-[110px] px-3 md:px-5 py-2.5 rounded-xl transition-all duration-300 shrink-0 border ${
+                  className={`relative flex flex-col items-center justify-center min-w-[100px] md:min-w-[130px] px-4 md:px-6 py-3 md:py-4 rounded-xl transition-all duration-300 shrink-0 border ${
                     isSelected 
                       ? 'bg-green-600 border-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)] z-20 scale-105' 
                       : 'bg-black border-white/10 hover:bg-black/80 hover:border-white/30 hover:scale-105 z-10 shadow-lg'
                   }`}
                 >
                   <span 
-                    className="font-black text-sm md:text-base text-[#ff6347] whitespace-nowrap drop-shadow-md tracking-wide"
+                    className="font-black text-lg md:text-xl text-[#ff6347] whitespace-nowrap drop-shadow-md tracking-wide"
                     style={{ WebkitTextStroke: '1px white', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}
                   >
                     {item.name.replace(/^(صوص|سلطة|مشروب)\s+/g, '')}
                   </span>
                   <span 
-                    className="font-black text-[11px] md:text-xs text-white whitespace-nowrap drop-shadow-md"
+                    className="font-black text-sm md:text-base text-white whitespace-nowrap drop-shadow-md mt-1"
                     style={{ WebkitTextStroke: '0.5px #ff6347', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
                   >
                     {item.price} ريال
