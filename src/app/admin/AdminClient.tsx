@@ -218,8 +218,11 @@ function ProductForm({ initial, categories, onSave, onCancel, onToast }: {
         ].map(f => (
           <label key={f.key} className="space-y-1">
             <span className="text-xs text-white/40">{f.label}</span>
-            <input type={f.type ?? 'text'} value={(form[f.key] ?? '') as string}
-              onChange={e => set(f.key, f.type === 'number' ? +e.target.value : e.target.value)}
+            <input 
+              type={f.type === 'number' ? 'text' : (f.type ?? 'text')}
+              inputMode={f.type === 'number' ? 'decimal' : undefined}
+              value={form[f.key]?.toString() ?? ''}
+              onChange={e => set(f.key, e.target.value)}
               placeholder={f.ph ?? ''}
               className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-pink-500 text-sm"/>
           </label>
@@ -307,7 +310,7 @@ function ProductForm({ initial, categories, onSave, onCancel, onToast }: {
       </div>
 
       <div className="flex gap-3">
-        <button type="button" onClick={async () => { setSaving(true); await onSave(form, imageBlob ?? undefined); setSaving(false); }} disabled={saving}
+        <button type="button" onClick={async () => { setSaving(true); await onSave({ ...form, price: Number(form.price) || 0 }, imageBlob ?? undefined); setSaving(false); }} disabled={saving}
           className="flex-1 flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white py-2.5 rounded-xl font-bold text-sm transition-colors">
           {saving ? <><Loader2 size={14} className="animate-spin"/> حفظ...</> : <><Check size={14}/> حفظ المنتج</>}
         </button>
@@ -402,7 +405,7 @@ function SauceForm({ initial, onSave, onCancel, onToast }: { initial?: Sauce; on
         </label>
         <label className="space-y-1 block">
           <span className="text-xs text-white/40">السعر (ر.س)</span>
-          <input type="number" value={form.price ?? 0} onChange={e => set('price', +e.target.value)}
+          <input type="text" inputMode="decimal" value={form.price?.toString() ?? ''} onChange={e => set('price', e.target.value)}
             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 focus:outline-none focus:border-pink-500 text-sm"/>
         </label>
       </div>
@@ -453,7 +456,7 @@ function SauceForm({ initial, onSave, onCancel, onToast }: { initial?: Sauce; on
       </div>
 
       <div className="flex gap-3 mt-4">
-        <button type="button" onClick={async () => { setSaving(true); await onSave(form, imageBlob ?? undefined); setSaving(false); }} disabled={saving}
+        <button type="button" onClick={async () => { setSaving(true); await onSave({ ...form, price: Number(form.price) || 0 }, imageBlob ?? undefined); setSaving(false); }} disabled={saving}
           className="flex-1 flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white py-2.5 rounded-xl font-bold text-sm transition-colors">
           {saving ? <Loader2 size={14} className="animate-spin"/> : <Check size={14}/>} حفظ
         </button>
