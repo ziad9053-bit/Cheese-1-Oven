@@ -152,7 +152,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       </div>
       {/* Layer 0 (z-0): Background Image */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-black">
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence>
           <motion.img 
             key={loadedBg}
             src={loadedBg}

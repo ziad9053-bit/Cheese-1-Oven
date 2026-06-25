@@ -60,7 +60,7 @@ export const ProductScene: React.FC<Props> = ({
       <div className="absolute inset-0 z-10 pointer-events-none translate-y-6 md:translate-y-10">
         {/* Central pizza image — animates only when product changes */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence>
           {/* We wrap the pizza and the sauce effect in one motion container so they animate in together when product changes */}
           <motion.div
             key={product?.id}
@@ -86,7 +86,7 @@ export const ProductScene: React.FC<Props> = ({
                   className="absolute inset-0 w-full h-full object-contain drop-shadow-xl"
                   initial={{ opacity: 0, scale: 0.75 }}
                   animate={{ opacity: 1, scale: 0.85 }}
-                  exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
+                  exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.25, ease: "easeOut" }}
                 />
               )}
@@ -103,7 +103,7 @@ export const ProductScene: React.FC<Props> = ({
                     className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
                     initial={{ opacity: 0, scale: 0.5, y: -20, rotate: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)", transition: { duration: 0.2 } }}
+                    exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   />
                 )}
@@ -121,7 +121,7 @@ export const ProductScene: React.FC<Props> = ({
                     className="w-full h-full object-contain"
                     initial={{ opacity: 0, scale: 0.5, y: -20, rotate: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)", transition: { duration: 0.2 } }}
+                    exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   />
                 )}
