@@ -44,7 +44,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
     cartTimer.current = setTimeout(() => setCartPulse(false), 400);
   };
 
-  const displayProducts = products.filter(p => !['brand_settings', 'salad', 'drink', 'side', 'sauce'].includes(p.product_type));
+  // نعرض في الدوران الرئيسي فقط المنتجات الأساسية (البيتزا والمعجنات)
+  const displayProducts = products.filter(p => ['pizza', 'pastry'].includes(p.product_type));
   const activeProduct = displayProducts[activeIndex] || null;
   const bgImageUrl = activeProduct?.category_id === 1 ? 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pizza.jpg' : 'https://ubezqecpelddbwapffmn.supabase.co/storage/v1/object/public/product-images/images/bg-pastry.jpg';
 
