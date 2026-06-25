@@ -205,10 +205,10 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       <AnimatePresence>
         {toastMessage && (
           <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] bg-black/80 backdrop-blur-md border border-green-500 text-white px-6 py-3 rounded-full font-bold shadow-[0_10px_25px_rgba(34,197,94,0.5)] whitespace-nowrap pointer-events-none flex items-center justify-center"
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] bg-black/90 backdrop-blur-md border border-green-500 text-green-400 px-6 py-3 rounded-2xl font-bold shadow-[0_10px_25px_rgba(34,197,94,0.3)] whitespace-nowrap pointer-events-none flex items-center justify-center"
           >
             {toastMessage}
           </motion.div>
