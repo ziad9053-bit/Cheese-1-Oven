@@ -45,5 +45,5 @@ export interface OrderItem {
   order_id: number;
   product_id: number;
   quantity: number;
-  selected_options: any;
+  selected_options: Record<string, unknown> | null;
 }

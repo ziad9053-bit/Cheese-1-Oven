@@ -28,6 +28,7 @@ export const ProductScene: React.FC<Props> = ({
   const [loadedBg, setLoadedBg] = useState<string>(bgImageUrl || "");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -42,16 +43,6 @@ export const ProductScene: React.FC<Props> = ({
   }, [bgImageUrl, loadedBg]);
 
   const safeIsMobile = mounted ? isMobile : false;
-  const pizzaRadius = safeIsMobile ? 88 : 145;
-  const sauceRadius = safeIsMobile ? 80 : 130; 
-  
-  const startAngle = 180;
-  const endAngle = 360;
-
-  const actionAngle = 90;
-  const actionAngleRad = (actionAngle * Math.PI) / 180;
-  const actionX = Math.cos(actionAngleRad) * pizzaRadius;
-  const actionY = Math.sin(actionAngleRad) * pizzaRadius;
 
   return (
     <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-transparent">

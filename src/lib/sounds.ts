@@ -1,16 +1,16 @@
-let sharedAudioCtx: any = null;
+let sharedAudioCtx: AudioContext | null = null;
 
 const getAudioContext = () => {
   if (typeof window === 'undefined') return null;
   try {
     if (!sharedAudioCtx) {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         sharedAudioCtx = new AudioContextClass();
       }
     }
     return sharedAudioCtx;
-  } catch (err) {
+  } catch {
     return null;
   }
 };
@@ -46,7 +46,7 @@ export const playWhooshSound = () => {
     gainNode.connect(audioCtx.destination);
     
     noiseSource.start();
-  } catch (err) {}
+  } catch {}
 };
 
 export const playPopSound = () => {
@@ -70,5 +70,5 @@ export const playPopSound = () => {
     
     osc.start();
     osc.stop(audioCtx.currentTime + 0.1);
-  } catch (err) {}
+  } catch {}
 };
