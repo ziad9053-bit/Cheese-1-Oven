@@ -100,55 +100,39 @@ export default function AddonsMenu({
           </button>
 
           {/* Items Row */}
-          <div className="flex items-center -space-x-3 space-x-reverse md:-space-x-4 px-2 overflow-x-auto hide-scrollbar scroll-smooth">
+          <div className="flex items-center gap-2 md:gap-3 px-2 overflow-x-auto hide-scrollbar scroll-smooth py-1">
             {getItems(activeCategory).map((item: any) => {
               const isSelected = getSelectedId(activeCategory) === item.id;
               return (
                 <button
                   key={item.id}
                   onClick={() => onSelect(activeCategory, isSelected ? null : item.id)}
-                  className={`relative flex flex-col items-center gap-1 transition-all duration-300 w-16 md:w-20 shrink-0 ${
+                  className={`relative flex flex-col items-center justify-center px-4 md:px-6 py-2 rounded-full transition-all duration-300 shrink-0 border ${
                     isSelected 
-                      ? 'z-20 -translate-y-3' 
-                      : 'z-0 opacity-80 hover:opacity-100 hover:-translate-y-2 hover:z-10'
+                      ? 'bg-green-500/80 border-green-400 shadow-[0_0_20px_rgba(34,197,94,0.5)] z-20 scale-105' 
+                      : 'bg-black/40 border-white/20 hover:bg-black/60 hover:scale-105 z-10'
                   }`}
                 >
-                  <div className="relative w-16 h-16 md:w-20 md:h-20 bg-black/20 rounded-full border border-white/5 drop-shadow-lg p-1">
-                    <div className={`w-full h-full rounded-full overflow-hidden ${isSelected ? 'sauce-active' : 'sauce-idle'}`}>
-                      <img 
-                        src={item.image_url} 
-                        alt={item.name}
-                        className="w-full h-full object-contain drop-shadow-md"
-                      />
+                  <span className="font-bold text-xs md:text-sm text-white whitespace-nowrap drop-shadow-md">
+                    {item.name}
+                  </span>
+                  <span className="text-[10px] text-white/80 whitespace-nowrap drop-shadow-md">
+                    {item.price} د.ع
+                  </span>
+                  {isSelected && (
+                    <div 
+                      role="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const typeMap = { sauces: 'sauce', salads: 'salad', drinks: 'drink' } as const;
+                        onAddToCart(item, typeMap[activeCategory as Category]);
+                      }}
+                      className="absolute -top-2 -right-2 z-50 bg-red-600 hover:bg-red-500 text-white p-1 md:p-1.5 rounded-full shadow-lg border border-white transition-transform hover:scale-110 active:scale-95 flex items-center justify-center cursor-pointer"
+                      title="إضافة للسلة"
+                    >
+                      <Plus className="w-3 h-3 md:w-4 md:h-4" strokeWidth={3} />
                     </div>
-                    {isSelected && (
-                      <div 
-                        role="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const typeMap = { sauces: 'sauce', salads: 'salad', drinks: 'drink' } as const;
-                          onAddToCart(item, typeMap[activeCategory as Category]);
-                        }}
-                        className="absolute -top-2 right-0 md:-top-2 md:-right-1 z-50 bg-red-600 hover:bg-red-500 text-white p-1 md:p-1.5 rounded-full shadow-lg border border-white transition-transform hover:scale-110 active:scale-95 flex items-center justify-center cursor-pointer"
-                        title="إضافة للسلة"
-                      >
-                        <Plus className="w-4 h-4" strokeWidth={3} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-center justify-center pt-1">
-                    <span className="text-[10px] md:text-[12px] font-black tracking-wide text-center leading-tight transition-all duration-300"
-                      style={{
-                        color: 'white',
-                        WebkitTextStroke: isSelected ? '0.5px rgba(0,0,0,0.8)' : '1px rgba(0,0,0,0.8)',
-                        textShadow: isSelected ? '0 2px 4px rgba(0,0,0,1)' : '0 1px 2px rgba(0,0,0,0.8)',
-                      }}>
-                      {item.name}
-                    </span>
-                    <span className="text-[9px] md:text-[10px] text-white/90 drop-shadow-md">
-                      {item.price} د.ع
-                    </span>
-                  </div>
+                  )}
                 </button>
               );
               })}
