@@ -674,38 +674,122 @@ export default function AdminClient({ initialProducts, initialCategories }: {
 
       {!isAuthenticated ? (
         <div className="flex-1 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 p-8 rounded-3xl w-full max-w-sm space-y-6 shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="bg-zinc-900 border border-white/10 p-6 md:p-8 rounded-3xl w-full max-w-sm space-y-6 shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="text-center space-y-2">
               <div className="w-16 h-16 bg-pink-600/20 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-500/30">
                 <Lock size={30} />
               </div>
-              <h2 className="text-2xl font-black text-white">تسجيل الدخول</h2>
-              <p className="text-white/40 text-sm">أدخل كلمة المرور للوصول إلى لوحة التحكم والـ Bucket</p>
+              <h2 className="text-2xl font-black text-white">بوابة الدخول</h2>
+              <p className="text-white/40 text-sm">اختر القسم وأدخل كلمة المرور</p>
             </div>
             
-            <input 
-              type="password" 
-              value={passwordInput} 
-              onChange={e => setPasswordInput(e.target.value)} 
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  if (passwordInput === '12345') setIsAuthenticated(true);
-                  else showToast('كلمة السر خاطئة!', 'err');
-                }
-              }}
-              placeholder="كلمة السر..." 
-              className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 text-center tracking-widest font-bold"
-            />
-            
-            <button 
-              onClick={() => {
-                if (passwordInput === '12345') setIsAuthenticated(true);
-                else showToast('كلمة السر خاطئة!', 'err');
-              }} 
-              className="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold py-3.5 rounded-2xl transition-colors shadow-lg shadow-pink-600/20"
-            >
-              دخول
-            </button>
+            <div className="space-y-4">
+              {/* Admin Login Row */}
+              <div className="bg-black/40 border border-white/10 rounded-2xl p-4 flex flex-col gap-3 transition-colors hover:border-pink-500/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-pink-500/20 rounded-full flex items-center justify-center">
+                    <LayoutDashboard size={18} className="text-pink-500" />
+                  </div>
+                  <span className="font-bold text-white text-lg flex-1">الإدارة</span>
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    type="password"
+                    id="admin-pass"
+                    placeholder="كلمة المرور..."
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        const pass = (e.target as HTMLInputElement).value;
+                        if (pass === '12345') setIsAuthenticated(true);
+                        else showToast('كلمة السر للإدارة خاطئة!', 'err');
+                      }
+                    }}
+                    className="flex-1 bg-black/60 border border-white/10 rounded-xl px-3 py-2.5 text-center text-white focus:outline-none focus:border-pink-500 font-black tracking-widest text-sm"
+                  />
+                  <button 
+                    onClick={() => {
+                      const pass = (document.getElementById('admin-pass') as HTMLInputElement).value;
+                      if (pass === '12345') setIsAuthenticated(true);
+                      else showToast('كلمة السر للإدارة خاطئة!', 'err');
+                    }}
+                    className="bg-pink-600 text-white font-bold px-4 rounded-xl hover:bg-pink-500 transition-colors"
+                  >
+                    دخول
+                  </button>
+                </div>
+              </div>
+
+              {/* Kitchen Login Row */}
+              <div className="bg-black/40 border border-white/10 rounded-2xl p-4 flex flex-col gap-3 transition-colors hover:border-orange-500/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
+                    <Layers size={18} className="text-orange-500" />
+                  </div>
+                  <span className="font-bold text-white text-lg flex-1">المطبخ</span>
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    type="password"
+                    id="kitchen-pass"
+                    placeholder="كلمة المرور..."
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        const pass = (e.target as HTMLInputElement).value;
+                        if (pass === '54321') window.location.href = '/kitchen';
+                        else showToast('كلمة السر للمطبخ خاطئة!', 'err');
+                      }
+                    }}
+                    className="flex-1 bg-black/60 border border-white/10 rounded-xl px-3 py-2.5 text-center text-white focus:outline-none focus:border-orange-500 font-black tracking-widest text-sm"
+                  />
+                  <button 
+                    onClick={() => {
+                      const pass = (document.getElementById('kitchen-pass') as HTMLInputElement).value;
+                      if (pass === '54321') window.location.href = '/kitchen';
+                      else showToast('كلمة السر للمطبخ خاطئة!', 'err');
+                    }}
+                    className="bg-orange-600 text-white font-bold px-4 rounded-xl hover:bg-orange-500 transition-colors"
+                  >
+                    دخول
+                  </button>
+                </div>
+              </div>
+
+              {/* Driver Login Row */}
+              <div className="bg-black/40 border border-white/10 rounded-2xl p-4 flex flex-col gap-3 transition-colors hover:border-blue-500/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                    <Package size={18} className="text-blue-500" />
+                  </div>
+                  <span className="font-bold text-white text-lg flex-1">سائق التوصيل</span>
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    type="password"
+                    id="driver-pass"
+                    placeholder="كلمة المرور..."
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        const pass = (e.target as HTMLInputElement).value;
+                        if (pass === '67890') window.location.href = '/driver';
+                        else showToast('كلمة السر للسائق خاطئة!', 'err');
+                      }
+                    }}
+                    className="flex-1 bg-black/60 border border-white/10 rounded-xl px-3 py-2.5 text-center text-white focus:outline-none focus:border-blue-500 font-black tracking-widest text-sm"
+                  />
+                  <button 
+                    onClick={() => {
+                      const pass = (document.getElementById('driver-pass') as HTMLInputElement).value;
+                      if (pass === '67890') window.location.href = '/driver';
+                      else showToast('كلمة السر للسائق خاطئة!', 'err');
+                    }}
+                    className="bg-blue-600 text-white font-bold px-4 rounded-xl hover:bg-blue-500 transition-colors"
+                  >
+                    دخول
+                  </button>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
       ) : (
