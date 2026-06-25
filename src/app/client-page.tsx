@@ -24,7 +24,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   const [drinkItems, setDrinkItems] = useState<any[]>([]);
   const [selectedSauceId, setSelectedSauceId] = useState<number | null>(null);
   const [selectedSaladId, setSelectedSaladId] = useState<number | null>(null);
-  const [selectedDrinkId, setSelectedDrinkId] = useState<number | null>(null);
+  const [selectedDrinkId, setSelectedDrinkId] = useState<any>(null);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [cartPulse, setCartPulse] = useState(false);

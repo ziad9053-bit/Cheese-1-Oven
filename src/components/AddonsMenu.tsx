@@ -8,13 +8,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface Props {
   sauces: Sauce[];
   salads: Product[];
-  drinks: Drink[]; // or Product[] if we unify, let's accept both for now
+  drinks: any[]; // or Product[] if we unify, let's accept both for now
   selectedSauce: number | null;
   onSelectSauce: (id: number | null) => void;
   selectedSalad: number | null;
   onSelectSalad: (id: number | null) => void;
-  selectedDrink: number | null;
-  onSelectDrink: (id: number | null) => void;
+  selectedDrink: any;
+  onSelectDrink: (id: any) => void;
   onAddToCart: (item: any, type: 'sauce' | 'salad' | 'drink') => void;
 }
 
@@ -128,7 +128,8 @@ export default function AddonsMenu({
                           role="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onAddToCart(item, activeCategory);
+                            const typeMap = { sauces: 'sauce', salads: 'salad', drinks: 'drink' } as const;
+                            onAddToCart(item, typeMap[activeCategory as Category]);
                           }}
                           className="absolute -top-2 right-0 md:-top-2 md:-right-1 z-50 bg-red-600 hover:bg-red-500 text-white p-1 md:p-1.5 rounded-full shadow-lg border border-white transition-transform hover:scale-110 active:scale-95 flex items-center justify-center cursor-pointer"
                           title="إضافة للسلة"
