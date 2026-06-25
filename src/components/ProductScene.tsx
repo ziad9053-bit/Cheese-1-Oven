@@ -92,8 +92,8 @@ export const ProductScene: React.FC<Props> = ({
               )}
             </AnimatePresence>
 
-            {/* SALAD EFFECT OVER PIZZA (Top-Right, shifted slightly left) */}
-            <div className="absolute -top-[10%] right-[2%] w-[45%] h-[45%] z-[60] drop-shadow-2xl pointer-events-none">
+            {/* SALAD EFFECT OVER PIZZA (Top-Right, overlapping edge ~80 degrees) */}
+            <div className="absolute top-[0%] right-[8%] w-[45%] h-[45%] z-[60] drop-shadow-2xl pointer-events-none">
               <AnimatePresence>
                 {selectedSalad && (
                   <motion.img
