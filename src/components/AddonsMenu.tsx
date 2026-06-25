@@ -114,7 +114,7 @@ export default function AddonsMenu({
                 <button
                   key={item.id}
                   onClick={() => onSelect(activeCategory, isSelected ? null : item.id)}
-                  className={`relative flex flex-col items-center justify-center min-w-[100px] md:min-w-[130px] px-4 md:px-6 py-3 md:py-4 rounded-xl transition-all duration-300 shrink-0 border ${
+                  className={`relative flex flex-col items-center justify-center min-w-[85px] md:min-w-[105px] px-2 md:px-4 py-1.5 md:py-2 rounded-xl transition-all duration-300 shrink-0 border ${
                     isSelected 
                       ? 'bg-green-600 border-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)] z-20 scale-105' 
                       : 'bg-black border-white/10 hover:bg-black/80 hover:border-white/30 hover:scale-105 z-10 shadow-lg'
