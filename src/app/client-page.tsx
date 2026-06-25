@@ -7,7 +7,7 @@ import { ProductScene } from '@/components/ProductScene';
 import { KineticCarousel } from '@/components/KineticCarousel';
 import { OrderingBottomSheet } from '@/components/OrderingBottomSheet';
 import { ShoppingCart } from 'lucide-react';
-import SauceSelector from '@/components/SauceSelector';
+import AddonsMenu from '@/components/AddonsMenu';
 import { playPopSound } from '@/lib/sounds';
 
 interface Props {
@@ -23,6 +23,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [drinkItems, setDrinkItems] = useState<any[]>([]);
   const [selectedSauceId, setSelectedSauceId] = useState<number | null>(null);
+  const [selectedSaladId, setSelectedSaladId] = useState<number | null>(null);
+  const [selectedDrinkId, setSelectedDrinkId] = useState<number | null>(null);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [cartPulse, setCartPulse] = useState(false);
@@ -73,15 +75,22 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
     showToast(`تم إضافة ${activeProduct.name} للسلة ✅`);
   };
 
-  const handleAddSauceToCart = (sauce: Sauce) => {
+  const salads = products.filter(p => p.product_type === 'salad');
+  const allDrinks = [...drinks, ...products.filter(p => p.product_type === 'drink')];
+
+  const handleAddAddonToCart = (item: any, type: 'sauce' | 'salad' | 'drink') => {
+    if (type === 'drink') {
+      handleAddDrink(item);
+      return;
+    }
     const newItem = {
       id: Math.random().toString(36).substring(7),
-      product: sauce as any, // Sauce maps directly to Product since it comes from the same DB table
+      product: item,
       quantity: 1,
       selectedSauceIds: []
     };
     setCartItems([...cartItems, newItem]);
-    showToast(`تم إضافة ${sauce.name} للسلة ✅`);
+    showToast(`تم إضافة ${item.name} للسلة ✅`);
   };
 
   const handleUpdateQuantity = (id: string, delta: number) => {
@@ -164,6 +173,8 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
             onAddClick={handleAddProduct}
             bgImageUrl={bgImageUrl}
             selectedSauce={sauces.find(s => s.id === selectedSauceId) || null}
+            selectedSalad={salads.find(s => s.id === selectedSaladId) || null}
+            selectedDrink={allDrinks.find(d => d.id === selectedDrinkId) || null}
           />
         ) : (
           <div className="flex items-center justify-center h-full pointer-events-auto">
@@ -237,13 +248,19 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         } catch(e) { return null; }
       })()}
 
-      {/* Sauce Selector Navigation Bar */}
+      {/* Addons Menu (Sauces, Salads, Drinks) */}
       {activeProduct?.category_id === 1 && (
-        <SauceSelector 
+        <AddonsMenu 
           sauces={sauces}
+          salads={salads}
+          drinks={allDrinks}
           selectedSauce={selectedSauceId}
           onSelectSauce={setSelectedSauceId}
-          onAddSauceToCart={handleAddSauceToCart}
+          selectedSalad={selectedSaladId}
+          onSelectSalad={setSelectedSaladId}
+          selectedDrink={selectedDrinkId}
+          onSelectDrink={setSelectedDrinkId}
+          onAddToCart={handleAddAddonToCart}
         />
       )}
 

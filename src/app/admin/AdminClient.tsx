@@ -241,6 +241,7 @@ function ProductForm({ initial, categories, onSave, onCancel, onToast }: {
             <option value="pastry">🥐 معجنات</option>
             <option value="drink">🥤 مشروبات</option>
             <option value="side">🫙 إضافات</option>
+            <option value="salad">🥗 سلطات</option>
           </select>
         </label>
 
