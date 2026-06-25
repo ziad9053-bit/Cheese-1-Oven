@@ -49,6 +49,8 @@ export const OrderingBottomSheet: React.FC<Props> = ({
   onAddDrink = () => {},
   onCheckout
 }) => {
+  const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup');
+
   const productsTotal = cartItems.reduce((total, item) => {
     const productPrice = item.product.price;
     const saucesPrice = item.selectedSauceIds.reduce((sum, sauceId) => {
@@ -225,8 +227,34 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                       </div>
                     </motion.div>
                   ))}
-                  <div className="mt-8 pt-6 border-t border-white/10 mb-8">
-                    <div className="flex items-center justify-between">
+                  <div className="mt-8 pt-6 border-t border-white/10">
+                    <div className="mb-6 space-y-3">
+                      <h3 className="text-white font-bold text-lg">نوع الطلب</h3>
+                      <div className="flex gap-4">
+                        <button 
+                          onClick={() => setOrderType('pickup')}
+                          className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all ${
+                            orderType === 'pickup' 
+                              ? 'border-primary bg-primary/10 text-primary' 
+                              : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
+                          }`}
+                        >
+                          🏪 استلام من المحل
+                        </button>
+                        <button 
+                          onClick={() => setOrderType('delivery')}
+                          className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold transition-all ${
+                            orderType === 'delivery' 
+                              ? 'border-primary bg-primary/10 text-primary' 
+                              : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
+                          }`}
+                        >
+                          🛵 توصيل
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between mb-8">
                       <span className="text-white/60 text-lg font-bold">الإجمالي:</span>
                       <span className="text-4xl font-black text-white">{total} <span className="text-xl text-primary">ر.س</span></span>
                     </div>
