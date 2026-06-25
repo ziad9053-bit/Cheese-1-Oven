@@ -338,11 +338,65 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
         onRemoveDrinkItem={handleRemoveDrinkItem}
         drinks={drinks}
         onAddDrink={handleAddDrink}
-        onCheckout={() => {
-          alert('تم استلام طلبك بنجاح!');
-          setCartItems([]);
-          setDrinkItems([]);
-          setIsSheetOpen(false);
+        onCheckout={async (data: any) => {
+          try {
+            // Calculate total price
+            const productsTotal = cartItems.reduce((total, item) => {
+              const productPrice = item.product.price;
+              const saucesPrice = item.selectedSauceIds.reduce((sum, sauceId) => {
+                const sauce = sauces.find(s => s.id === sauceId);
+                return sum + (sauce?.price || 0);
+              }, 0);
+              return total + ((productPrice + saucesPrice) * item.quantity);
+            }, 0);
+            
+            const drinksTotal = drinkItems.reduce((total, item) => total + (item.drink.price * item.quantity), 0);
+            const total_price = productsTotal + drinksTotal;
+
+            // Map items
+            const mappedItems = [
+              ...cartItems.map(item => ({
+                type: 'product',
+                id: item.product.id,
+                name: item.product.name,
+                quantity: item.quantity,
+                sauces: item.selectedSauceIds.map(id => sauces.find(s => s.id === id)?.name)
+              })),
+              ...drinkItems.map(item => ({
+                type: 'drink',
+                id: item.drink.id,
+                name: item.drink.name,
+                quantity: item.quantity
+              }))
+            ];
+
+            const { data: insertedData, error } = await supabase.from('orders').insert([{
+              customer_name: data.customerName,
+              customer_phone: data.customerPhone,
+              customer_address: data.customerAddress || null,
+              order_type: data.orderType,
+              notes: data.notes || null,
+              items: mappedItems,
+              total_price,
+              status: 'preparing'
+            }]).select().single();
+
+            if (error) {
+              console.error(error);
+              showToast('حدث خطأ أثناء إرسال الطلب، الرجاء المحاولة مرة أخرى');
+              return;
+            }
+
+            setCartItems([]);
+            setDrinkItems([]);
+            setIsSheetOpen(false);
+            setPlacedOrderId(insertedData.id);
+            localStorage.setItem('placedOrderId', insertedData.id);
+
+          } catch (err) {
+            console.error(err);
+            showToast('حدث خطأ غير متوقع');
+          }
         }}
       />
     </main>
