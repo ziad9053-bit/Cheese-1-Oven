@@ -123,6 +123,18 @@ export default function KitchenPage() {
                   {order.order_type === 'pickup' ? <Store size={14} className="text-pink-400" /> : <Package size={14} className="text-blue-400" />}
                   <span>{order.order_type === 'pickup' ? 'استلام' : 'توصيل'} - {order.customer_name}</span>
                 </div>
+                
+                {/* Quick Action Button for Mobile/Fast workflow */}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    markAsReady(order.id);
+                  }}
+                  className="mt-3 w-full bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/30 rounded-xl py-2 flex items-center justify-center gap-2 text-sm font-bold transition-all"
+                >
+                  <CheckCircle size={16} />
+                  تجهيز سريع
+                </button>
               </motion.button>
             ))}
           </AnimatePresence>

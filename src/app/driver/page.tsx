@@ -116,6 +116,31 @@ export default function DriverPage() {
                   <MapPin size={14} className="text-blue-400" />
                   <span className="truncate">{order.customer_address}</span>
                 </div>
+
+                {/* Quick Action Buttons for Mobile/Fast workflow */}
+                <div className="mt-3 flex gap-2">
+                  {order.status === 'ready' ? (
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateStatus(order.id, 'out_for_delivery');
+                      }}
+                      className="w-full bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-black border border-blue-500/30 rounded-xl py-2 flex items-center justify-center gap-2 text-sm font-bold transition-all"
+                    >
+                      <Truck size={16} /> استلام للبدء
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateStatus(order.id, 'delivered');
+                      }}
+                      className="w-full bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/30 rounded-xl py-2 flex items-center justify-center gap-2 text-sm font-bold transition-all"
+                    >
+                      <CheckCircle size={16} /> تم التسليم
+                    </button>
+                  )}
+                </div>
               </motion.button>
             ))}
           </AnimatePresence>
