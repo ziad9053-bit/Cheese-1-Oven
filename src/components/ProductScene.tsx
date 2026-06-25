@@ -43,6 +43,12 @@ export const ProductScene: React.FC<Props> = ({
   }, [bgImageUrl, loadedBg]);
 
   const safeIsMobile = mounted ? isMobile : false;
+  const pizzaRadius = safeIsMobile ? 88 : 145;
+  
+  const actionAngle = 90;
+  const actionAngleRad = (actionAngle * Math.PI) / 180;
+  const actionX = Math.cos(actionAngleRad) * pizzaRadius;
+  const actionY = Math.sin(actionAngleRad) * pizzaRadius;
 
   return (
     <div className="relative w-full h-full overflow-hidden flex items-center justify-center bg-transparent">
