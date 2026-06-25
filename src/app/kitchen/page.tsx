@@ -1,17 +1,18 @@
 "use client";
 
 import React from 'react';
-import { Layers, ArrowRight } from 'lucide-react';
+import { Layers, Home } from 'lucide-react';
 
 export default function KitchenPage() {
   return (
     <div className="min-h-screen bg-black text-white p-6 flex flex-col">
       <div className="flex items-center gap-4 mb-8">
         <button 
-          onClick={() => window.location.href = '/admin'}
+          onClick={() => window.location.href = '/'}
           className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+          title="العودة للصفحة الرئيسية"
         >
-          <ArrowRight size={24} />
+          <Home size={24} />
         </button>
         <div className="w-12 h-12 bg-orange-500/20 rounded-full flex items-center justify-center">
           <Layers size={24} className="text-orange-500" />

@@ -675,12 +675,21 @@ export default function AdminClient({ initialProducts, initialCategories }: {
       {!isAuthenticated ? (
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="bg-zinc-900 border border-white/10 p-6 md:p-8 rounded-3xl w-full max-w-sm space-y-6 shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-pink-600/20 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-500/30">
-                <Lock size={30} />
+            <div className="flex justify-between items-start w-full">
+              <button 
+                onClick={() => window.location.href = '/'}
+                className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors self-start"
+                title="العودة للصفحة الرئيسية"
+              >
+                <ArrowRight size={24} className="text-white/70" />
+              </button>
+              <div className="text-center space-y-2 flex-1 -ml-10">
+                <div className="w-16 h-16 bg-pink-600/20 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-500/30">
+                  <Lock size={30} />
+                </div>
+                <h2 className="text-2xl font-black text-white">بوابة الدخول</h2>
+                <p className="text-white/40 text-sm">اختر القسم وأدخل كلمة المرور</p>
               </div>
-              <h2 className="text-2xl font-black text-white">بوابة الدخول</h2>
-              <p className="text-white/40 text-sm">اختر القسم وأدخل كلمة المرور</p>
             </div>
             
             <div className="space-y-4">
@@ -797,7 +806,14 @@ export default function AdminClient({ initialProducts, initialCategories }: {
 
         {/* MENU */}
         {section === 'menu' && (
-          <div className="space-y-4 pt-8 md:pt-16">
+          <div className="space-y-4 pt-4 md:pt-8 relative">
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="absolute top-0 right-0 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+              title="العودة للصفحة الرئيسية"
+            >
+              <ArrowRight size={24} className="text-white/70" />
+            </button>
             <div className="text-center mb-10 space-y-2">
               <p className="text-xs text-white/40 uppercase tracking-widest font-black">لوحة تحكم</p>
               <h1 className="text-3xl font-black text-white">Cheese 1 Oven 🍕</h1>
