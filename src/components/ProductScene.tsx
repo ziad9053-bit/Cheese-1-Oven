@@ -80,7 +80,7 @@ export const ProductScene: React.FC<Props> = ({
                   key={`sauce-effect-${selectedSauce.id}`}
                   src={selectedSauce.description}
                   alt="Sauce Effect"
-                  className="absolute inset-0 w-full h-full object-contain"
+                  className="absolute inset-0 w-full h-full object-contain will-change-transform"
                   initial={{ opacity: 0, scale: 0.75 }}
                   animate={{ opacity: 1, scale: 0.85 }}
                   exit={{ opacity: 0, scale: 0.95 }}
@@ -90,14 +90,14 @@ export const ProductScene: React.FC<Props> = ({
             </AnimatePresence>
 
             {/* SALAD EFFECT OVER PIZZA (Top-Right, overlapping edge ~80 degrees) */}
-            <div className="absolute top-[0%] right-[8%] w-[45%] h-[45%] z-[60] drop-shadow-2xl pointer-events-none">
+            <div className="absolute top-[0%] right-[8%] w-[45%] h-[45%] z-[60] pointer-events-none">
               <AnimatePresence>
                 {selectedSalad && (
                   <motion.img
                     key={`salad-effect-${selectedSalad.id}`}
                     src={selectedSalad.image_url}
                     alt="Salad Effect"
-                    className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
+                    className="w-full h-full object-contain will-change-transform"
                     initial={{ opacity: 0, scale: 0.5, y: -20, rotate: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                     exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
@@ -108,14 +108,14 @@ export const ProductScene: React.FC<Props> = ({
             </div>
 
             {/* DRINK EFFECT OVER PIZZA (Top-Left, shifted slightly right) */}
-            <div className="absolute -top-[15%] left-[12%] w-[28%] h-[50%] z-[60] drop-shadow-2xl pointer-events-none">
+            <div className="absolute -top-[15%] left-[12%] w-[28%] h-[50%] z-[60] pointer-events-none">
               <AnimatePresence>
                 {selectedDrink && (
                   <motion.img
                     key={`drink-effect-${selectedDrink.id}`}
                     src={selectedDrink.image_url}
                     alt="Drink Effect"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain will-change-transform"
                     initial={{ opacity: 0, scale: 0.5, y: -20, rotate: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                     exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
@@ -147,7 +147,10 @@ export const ProductScene: React.FC<Props> = ({
                 ease: "easeInOut"
               }}
             >
-              <h2 className="text-4xl md:text-6xl font-black text-white drop-shadow-[0_0_20px_rgba(236,72,153,1)] text-center px-4 leading-tight">
+              <h2 
+                className="text-4xl md:text-6xl font-black text-white text-center px-4 leading-tight"
+                style={{ textShadow: '0 0 20px rgba(236,72,153,1)' }}
+              >
                 {product.name}
               </h2>
             </motion.div>
