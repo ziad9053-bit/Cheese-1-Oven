@@ -61,6 +61,14 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
             >
               <ChefHat size={48} />
             </motion.div>
+          ) : status === 'out_for_delivery' ? (
+            <motion.div 
+              animate={{ x: [0, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              className="w-24 h-24 mx-auto bg-blue-500/20 text-blue-500 rounded-full flex items-center justify-center border-4 border-blue-500/30"
+            >
+              <Package size={48} />
+            </motion.div>
           ) : (
             <motion.div 
               initial={{ scale: 0 }}
@@ -72,15 +80,25 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
           )}
 
           <h2 className="text-3xl font-black text-white">
-            {status === 'pending' || status === 'preparing' ? 'قيد التجهيز 👨‍🍳' : 'طلبك جاهز! 🎉'}
+            {status === 'pending' || status === 'preparing' 
+              ? 'قيد التجهيز 👨‍🍳' 
+              : status === 'out_for_delivery'
+                ? 'جاري التوصيل 🛵'
+                : status === 'delivered'
+                  ? 'تم التوصيل! 🎉'
+                  : 'طلبك جاهز! 🎉'}
           </h2>
           
           <p className="text-white/60">
             {status === 'pending' || status === 'preparing' 
               ? 'يتم الآن تحضير طلبك بكل حب واهتمام في المطبخ.'
-              : orderType === 'pickup' 
-                ? 'طلبك جاهز الآن، بانتظار وصولك لاستلامه من المحل 🚗'
-                : 'طلبك جاهز وتم تسليمه للسائق لتوصيله إليك 🛵'
+              : status === 'out_for_delivery'
+                ? 'السائق في الطريق إليك الآن، استعد لاستلام طلبك الساخن.'
+                : status === 'delivered'
+                  ? 'تم تسليم طلبك بنجاح. بالعافية!'
+                  : orderType === 'pickup' 
+                    ? 'طلبك جاهز الآن، بانتظار وصولك لاستلامه من المحل 🚗'
+                    : 'طلبك جاهز، وبانتظار استلام السائق له لتوصيله 🛵'
             }
           </p>
         </div>
