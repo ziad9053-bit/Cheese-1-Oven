@@ -225,21 +225,19 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                       </div>
                     </motion.div>
                   ))}
+                  <div className="mt-8 pt-6 border-t border-white/10 mb-8">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/60 text-lg font-bold">الإجمالي:</span>
+                      <span className="text-4xl font-black text-white">{total} <span className="text-xl text-primary">ر.س</span></span>
+                    </div>
+                  </div>
                 </>
               )}
             </AnimatePresence>
-
-
-
           </div>
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-zinc-950/90 backdrop-blur-md border-t border-white/10 pt-4 pb-8">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-white/60">الإجمالي</span>
-            <span className="text-3xl font-black text-white">{total} <span className="text-lg text-primary">ر.س</span></span>
-          </div>
-          
           <button 
             disabled={cartItems.length === 0 && drinkCartItems.length === 0}
             onClick={onCheckout}
