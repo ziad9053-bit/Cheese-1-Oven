@@ -92,9 +92,27 @@ export const ProductScene: React.FC<Props> = ({
               )}
             </AnimatePresence>
 
-            {/* SALAD & DRINK EFFECTS LAYER OVER PIZZA */}
-            <div className="absolute -top-12 -right-12 md:-top-16 md:-right-16 flex items-end gap-2 md:gap-4 z-20 drop-shadow-2xl">
-              <AnimatePresence mode="popLayout">
+            {/* SALAD EFFECT OVER PIZZA (Top-Right) */}
+            <div className="absolute -top-12 -right-4 md:-top-16 md:-right-12 z-20 drop-shadow-2xl">
+              <AnimatePresence>
+                {selectedSalad && (
+                  <motion.img
+                    key={`salad-effect-${selectedSalad.id}`}
+                    src={selectedSalad.image_url}
+                    alt="Salad Effect"
+                    className="w-28 h-28 md:w-40 md:h-40 object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
+                    initial={{ opacity: 0, scale: 0.5, y: -20, rotate: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)", transition: { duration: 0.2 } }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* DRINK EFFECT OVER PIZZA (Top-Left) */}
+            <div className="absolute -top-12 -left-4 md:-top-16 md:-left-12 z-20 drop-shadow-2xl">
+              <AnimatePresence>
                 {selectedDrink && (
                   <motion.img
                     key={`drink-effect-${selectedDrink.id}`}
@@ -105,20 +123,6 @@ export const ProductScene: React.FC<Props> = ({
                     animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                     exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)", transition: { duration: 0.2 } }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  />
-                )}
-              </AnimatePresence>
-              <AnimatePresence mode="popLayout">
-                {selectedSalad && (
-                  <motion.img
-                    key={`salad-effect-${selectedSalad.id}`}
-                    src={selectedSalad.image_url}
-                    alt="Salad Effect"
-                    className="w-28 h-28 md:w-40 md:h-40 object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
-                    initial={{ opacity: 0, scale: 0.5, y: -20, rotate: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)", transition: { duration: 0.2 } }}
-                    transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.05 }}
                   />
                 )}
               </AnimatePresence>
