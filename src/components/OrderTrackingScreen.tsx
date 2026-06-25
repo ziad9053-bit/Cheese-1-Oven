@@ -87,7 +87,7 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
 
         <div className="bg-black/40 rounded-2xl p-4 border border-white/5">
           <p className="text-white/40 text-xs mb-1">رقم الطلب</p>
-          <p className="text-white font-mono font-bold">{orderId.split('-')[0].toUpperCase()}</p>
+          <p className="text-white font-mono font-bold">{String(orderId).includes('-') ? String(orderId).split('-')[0].toUpperCase() : String(orderId).toUpperCase()}</p>
         </div>
       </motion.div>
     </div>

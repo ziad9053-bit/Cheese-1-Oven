@@ -44,6 +44,15 @@ CREATE POLICY "Allow public insert on orders" ON orders FOR INSERT WITH CHECK (t
 CREATE POLICY "Allow public select on orders" ON orders FOR SELECT USING (true);
 CREATE POLICY "Allow public update on orders" ON orders FOR UPDATE USING (true);
 
+-- تفعيل ميزة التحديث المباشر (Realtime) لجدول الطلبات لكي يعمل المطبخ بشكل فوري
+begin;
+  -- remove the supabase_realtime publication
+  drop publication if exists supabase_realtime;
+  -- re-create the supabase_realtime publication with no tables
+  create publication supabase_realtime;
+commit;
+alter publication supabase_realtime add table orders;
+
 -- ملاحظة هامة حول "User Space":
 -- إذا قمت بإنشاء المستخدمين عبر قسم Authentication في Supabase (بالإيميل والباسورد)،
 -- فنظام الدخول في الكود سيعتمد مؤقتاً على كلمات السر المحفوظة في هذا الجدول (store_roles) لتسريع الدخول بدون إيميل.

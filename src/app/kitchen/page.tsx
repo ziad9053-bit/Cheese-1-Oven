@@ -103,7 +103,7 @@ export default function KitchenPage() {
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">
-                  <span className="font-bold font-mono">#{order.id.split('-')[0].toUpperCase()}</span>
+                  <span className="font-bold font-mono">#{String(order.id).includes('-') ? String(order.id).split('-')[0].toUpperCase() : String(order.id).toUpperCase()}</span>
                   <span className="text-xs text-white/50 flex items-center gap-1">
                     <Clock size={12} />
                     {new Date(order.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute:'2-digit' })}
@@ -126,7 +126,7 @@ export default function KitchenPage() {
             <div className="flex justify-between items-start mb-8 pb-6 border-b border-white/10">
               <div>
                 <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
-                  طلب #{selectedOrder.id.split('-')[0].toUpperCase()}
+                  طلب #{String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
                   <span className={`text-xs px-3 py-1 rounded-full border ${
                     selectedOrder.order_type === 'pickup' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                   }`}>
