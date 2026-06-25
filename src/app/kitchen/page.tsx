@@ -29,8 +29,8 @@ export default function KitchenPage() {
     };
     fetchOrders();
 
-    // Hidden background refresh every 10 seconds
-    const intervalId = setInterval(fetchOrders, 10000);
+    // Hidden background refresh every 3 seconds
+    const intervalId = setInterval(fetchOrders, 3000);
 
     // Subscribe to realtime updates
     const sub = supabase.channel('kitchen_orders')

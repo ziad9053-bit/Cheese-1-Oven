@@ -29,8 +29,8 @@ export default function DriverPage() {
     };
     fetchOrders();
 
-    // Hidden background refresh every 10 seconds
-    const intervalId = setInterval(fetchOrders, 10000);
+    // Hidden background refresh every 3 seconds
+    const intervalId = setInterval(fetchOrders, 3000);
 
     const sub = supabase.channel('driver_orders')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: 'order_type=eq.delivery' }, (payload) => {
