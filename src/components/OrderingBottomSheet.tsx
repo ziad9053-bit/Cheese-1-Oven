@@ -18,6 +18,14 @@ interface DrinkCartItem {
   quantity: number;
 }
 
+export interface CheckoutData {
+  orderType: 'pickup' | 'delivery';
+  customerName: string;
+  customerPhone: string;
+  customerAddress: string;
+  notes: string;
+}
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -32,7 +40,7 @@ interface Props {
   drinks?: Drink[];
   onAddDrink?: (drink: Drink) => void;
   
-  onCheckout?: () => void;
+  onCheckout?: (data: CheckoutData) => void;
 }
 
 export const OrderingBottomSheet: React.FC<Props> = ({ 
@@ -50,6 +58,10 @@ export const OrderingBottomSheet: React.FC<Props> = ({
   onCheckout
 }) => {
   const [orderType, setOrderType] = useState<'pickup' | 'delivery'>('pickup');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [notes, setNotes] = useState('');
 
   const productsTotal = cartItems.reduce((total, item) => {
     const productPrice = item.product.price;
@@ -254,6 +266,53 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                       </div>
                     </div>
 
+                    <div className="mb-6 space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-white/70 text-sm font-bold">الاسم (إجباري)</label>
+                        <input 
+                          type="text" 
+                          value={customerName}
+                          onChange={e => setCustomerName(e.target.value)}
+                          placeholder="الاسم الكريم..." 
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary text-right"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-white/70 text-sm font-bold">رقم الجوال (إجباري)</label>
+                        <input 
+                          type="tel" 
+                          value={customerPhone}
+                          onChange={e => setCustomerPhone(e.target.value)}
+                          placeholder="05XXXXXXXX" 
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary text-right text-left-dir"
+                        />
+                      </div>
+
+                      {orderType === 'delivery' && (
+                        <div className="space-y-2">
+                          <label className="text-white/70 text-sm font-bold">العنوان (إجباري للتوصيل)</label>
+                          <input 
+                            type="text" 
+                            value={customerAddress}
+                            onChange={e => setCustomerAddress(e.target.value)}
+                            placeholder="اسم الحي، الشارع، رقم المبنى..." 
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary text-right"
+                          />
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <label className="text-white/70 text-sm font-bold">ملاحظات (اختياري)</label>
+                        <textarea 
+                          value={notes}
+                          onChange={e => setNotes(e.target.value)}
+                          placeholder="أي ملاحظات إضافية على الطلب؟" 
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary text-right resize-none h-20"
+                        />
+                      </div>
+                    </div>
+
                     <div className="flex items-center justify-between mb-8">
                       <span className="text-white/60 text-lg font-bold">الإجمالي:</span>
                       <span className="text-4xl font-black text-white">{total} <span className="text-xl text-primary">ر.س</span></span>
@@ -268,7 +327,29 @@ export const OrderingBottomSheet: React.FC<Props> = ({
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-zinc-950/90 backdrop-blur-md border-t border-white/10 pt-4 pb-8">
           <button 
             disabled={cartItems.length === 0 && drinkCartItems.length === 0}
-            onClick={onCheckout}
+            onClick={() => {
+              if (!customerName.trim()) {
+                alert('الرجاء إدخال الاسم الكريم');
+                return;
+              }
+              if (!customerPhone.trim()) {
+                alert('الرجاء إدخال رقم الجوال');
+                return;
+              }
+              if (orderType === 'delivery' && !customerAddress.trim()) {
+                alert('الرجاء إدخال العنوان للتوصيل');
+                return;
+              }
+              if (onCheckout) {
+                onCheckout({
+                  orderType,
+                  customerName,
+                  customerPhone,
+                  customerAddress,
+                  notes
+                });
+              }
+            }}
             className="w-full bg-gradient-to-r from-primary to-rose-500 text-white font-bold text-lg py-4 rounded-2xl flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(236,72,153,0.3)] disabled:opacity-50 disabled:grayscale transition-all active:scale-[0.98]"
           >
             <CreditCard className="w-6 h-6" />

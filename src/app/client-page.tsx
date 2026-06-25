@@ -6,6 +6,8 @@ import { Product, Sauce, Drink } from '@/lib/data';
 import { ProductScene } from '@/components/ProductScene';
 import { KineticCarousel } from '@/components/KineticCarousel';
 import { OrderingBottomSheet } from '@/components/OrderingBottomSheet';
+import { OrderTrackingScreen } from '@/components/OrderTrackingScreen';
+import { supabase } from '@/lib/supabase';
 import { ShoppingCart } from 'lucide-react';
 import AddonsMenu from '@/components/AddonsMenu';
 import { playPopSound } from '@/lib/sounds';
@@ -29,8 +31,14 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [cartPulse, setCartPulse] = useState(false);
+  const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const toastTimer = useRef<NodeJS.Timeout | null>(null);
   const cartTimer = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('placedOrderId');
+    if (saved) setPlacedOrderId(saved);
+  }, []);
 
   const showToast = (message: string) => {
     playPopSound();
@@ -137,6 +145,15 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
 
   return (
     <main className="fixed inset-0 overflow-hidden bg-black text-white flex flex-col">
+      {placedOrderId && (
+        <OrderTrackingScreen 
+          orderId={placedOrderId} 
+          onClose={() => {
+            setPlacedOrderId(null);
+            localStorage.removeItem('placedOrderId');
+          }} 
+        />
+      )}
       {/* Admin Button — top left */}
       <a
         href="/admin"

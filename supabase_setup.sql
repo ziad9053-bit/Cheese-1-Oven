@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS orders (
     customer_name TEXT NOT NULL,
     customer_phone TEXT NOT NULL,
     customer_address TEXT,
+    order_type TEXT NOT NULL DEFAULT 'pickup', -- 'pickup', 'delivery'
+    notes TEXT,
     items JSONB NOT NULL, -- سيحتوي على مصفوفة الأصناف (البيتزا، الصوصات، السلطات، إلخ)
     total_price DECIMAL(10,2) NOT NULL,
     status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'
