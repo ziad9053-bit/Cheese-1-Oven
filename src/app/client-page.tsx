@@ -168,7 +168,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
       </div>
       
       {/* Layer 1: Central product scene */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 z-40 pointer-events-none">
         {activeProduct ? (
           <ProductScene 
             product={activeProduct}

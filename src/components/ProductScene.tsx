@@ -93,14 +93,14 @@ export const ProductScene: React.FC<Props> = ({
             </AnimatePresence>
 
             {/* SALAD EFFECT OVER PIZZA (Top-Right) */}
-            <div className="absolute -top-12 -right-4 md:-top-16 md:-right-12 z-20 drop-shadow-2xl">
+            <div className="absolute -top-[10%] -right-[5%] w-[55%] h-[55%] z-[60] drop-shadow-2xl pointer-events-none">
               <AnimatePresence>
                 {selectedSalad && (
                   <motion.img
                     key={`salad-effect-${selectedSalad.id}`}
                     src={selectedSalad.image_url}
                     alt="Salad Effect"
-                    className="w-28 h-28 md:w-40 md:h-40 object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
+                    className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)]"
                     initial={{ opacity: 0, scale: 0.5, y: -20, rotate: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                     exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)", transition: { duration: 0.2 } }}
@@ -111,14 +111,14 @@ export const ProductScene: React.FC<Props> = ({
             </div>
 
             {/* DRINK EFFECT OVER PIZZA (Top-Left) */}
-            <div className="absolute -top-12 -left-4 md:-top-16 md:-left-12 z-20 drop-shadow-2xl">
+            <div className="absolute -top-[12%] -left-[2%] w-[25%] h-[45%] z-[60] drop-shadow-2xl pointer-events-none">
               <AnimatePresence>
                 {selectedDrink && (
                   <motion.img
                     key={`drink-effect-${selectedDrink.id}`}
                     src={selectedDrink.image_url}
                     alt="Drink Effect"
-                    className="w-24 h-32 md:w-32 md:h-48 object-contain"
+                    className="w-full h-full object-contain"
                     initial={{ opacity: 0, scale: 0.5, y: -20, rotate: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
                     exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)", transition: { duration: 0.2 } }}
