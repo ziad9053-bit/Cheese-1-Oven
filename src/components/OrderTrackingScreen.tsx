@@ -169,11 +169,11 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
           </div>
 
           <div className="bg-white p-4 rounded-2xl inline-block shadow-2xl relative group">
-            <div className="absolute inset-0 bg-emerald-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className={`absolute inset-0 ${status === 'ready' || status === 'delivered' ? 'bg-emerald-500/20' : 'bg-red-400/20'} rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
             <QRCode 
               value={qrValue} 
               size={160} 
-              fgColor={status === 'delivered' ? '#10b981' : '#0a0a0a'} 
+              fgColor={status === 'ready' || status === 'delivered' ? '#10b981' : '#f87171'} 
               className="relative z-10"
             />
           </div>
