@@ -192,13 +192,13 @@ export default function KitchenPage() {
       </div>
 
       {/* Main Area / Details - Hidden on mobile if NO order is selected */}
-      <div className={`flex-1 bg-zinc-900 border border-white/10 rounded-3xl p-4 md:p-6 flex-col relative md:overflow-hidden ${!selectedOrder ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`w-full md:flex-1 bg-zinc-900 border border-white/10 rounded-3xl p-4 md:p-6 flex-col relative h-[calc(100dvh-2rem)] md:h-auto md:min-h-[600px] md:overflow-hidden ${!selectedOrder ? 'hidden md:flex' : 'flex'}`}>
         
         {/* Mobile Back Button */}
         {selectedOrder && (
           <button 
             onClick={() => setSelectedOrder(null)}
-            className="md:hidden flex items-center gap-2 text-white/70 bg-white/5 hover:bg-white/10 p-3 rounded-xl mb-4 transition-all w-fit"
+            className="md:hidden flex items-center gap-2 text-white/70 bg-white/5 hover:bg-white/10 p-3 rounded-xl mb-4 transition-all w-fit shrink-0"
           >
             <ArrowRight size={18} />
             العودة للقائمة
@@ -206,10 +206,10 @@ export default function KitchenPage() {
         )}
 
         {selectedOrder ? (
-          <div className="flex-1 flex flex-col h-full min-h-[60vh]">
-            <div className="flex flex-col md:flex-row justify-between items-start mb-6 md:mb-8 pb-6 border-b border-white/10 gap-4 shrink-0">
+          <div className="flex-1 flex flex-col h-full overflow-hidden">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-6 pb-6 border-b border-white/10 gap-4 shrink-0 overflow-y-auto max-h-[40vh] custom-scrollbar">
               <div>
-                <h2 className="text-2xl md:text-3xl font-black mb-2 flex items-center gap-3">
+                <h2 className="text-2xl md:text-3xl font-black mb-2 flex flex-wrap items-center gap-2 md:gap-3">
                   طلب #{String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
                   <span className={`text-xs px-3 py-1 rounded-full border hidden md:inline-block ${
                     selectedOrder.order_type === 'pickup' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
@@ -230,7 +230,7 @@ export default function KitchenPage() {
                 </h2>
                 
                 {/* Mobile Badges */}
-                <div className="flex md:hidden gap-2 mb-2">
+                <div className="flex md:hidden flex-wrap gap-2 mb-2">
                   <span className={`text-xs px-3 py-1 rounded-full border ${
                     selectedOrder.order_type === 'pickup' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                   }`}>
@@ -260,7 +260,7 @@ export default function KitchenPage() {
               </div>
             </div>
 
-            <div className="flex-1 md:overflow-y-auto mb-6 pr-2">
+            <div className="flex-1 overflow-y-auto mb-4 pr-2 custom-scrollbar">
               <h3 className="text-lg font-bold text-white/80 mb-4">الأصناف المطلوبة</h3>
               <div className="space-y-3">
                 {selectedOrder.items?.map((item: any, idx: number) => (
@@ -286,12 +286,12 @@ export default function KitchenPage() {
               )}
             </div>
 
-            {/* Action Buttons based on status - Sticky to bottom on mobile */}
-            <div className="sticky bottom-0 bg-zinc-900 pt-4 pb-2 border-t border-white/10 mt-auto z-20">
+            {/* Action Buttons based on status */}
+            <div className="shrink-0 pt-4 pb-2 border-t border-white/10 mt-2 bg-zinc-900">
               {selectedOrder.status === 'pending' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'preparing')}
-                  className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black text-xl py-6 rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                  className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                 >
                   <ChefHat size={28} />
                   البدء بالتجهيز
@@ -301,7 +301,7 @@ export default function KitchenPage() {
               {selectedOrder.status === 'preparing' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'ready')}
-                  className="w-full bg-green-500 hover:bg-green-400 text-black font-black text-xl py-6 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                  className="w-full bg-green-500 hover:bg-green-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                 >
                   <CheckCircle size={28} />
                   الانتهاء من التجهيز ✔️
@@ -309,7 +309,7 @@ export default function KitchenPage() {
               )}
 
               {['ready', 'out_for_delivery', 'delivered'].includes(selectedOrder.status) && (
-                <div className="w-full bg-black/40 text-white/40 font-bold text-lg py-6 rounded-2xl flex items-center justify-center gap-3 border border-white/5">
+                <div className="w-full bg-black/40 text-white/40 font-bold text-lg py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 border border-white/5">
                   <CheckCircle size={24} />
                   تم التجهيز سابقاً
                 </div>
