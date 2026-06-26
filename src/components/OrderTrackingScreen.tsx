@@ -40,23 +40,14 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
     };
   }, [orderId]);
 
-  const RLM = '\u200F'; // Right-To-Left Mark to enforce correct alignment in generic QR scanners
-  const qrValue = orderDetails ? `${RLM}================================
-${RLM}      🧀 CHEESE 1 OVEN 🧀      
-${RLM}================================
-${RLM}رقم الطلب : #${String(orderDetails.id).includes('-') ? String(orderDetails.id).split('-')[0].toUpperCase() : String(orderDetails.id).toUpperCase()}
-${RLM}العميل    : ${orderDetails.customer_name}
-${RLM}الوقت     : ${new Date(orderDetails.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
-${RLM}النوع     : ${orderDetails.order_type === 'pickup' ? 'استلام من الفرع' : 'توصيل'}
-${RLM}--------------------------------
-${RLM}المشتريات:
-${orderDetails.items?.map((i: any) => `${RLM}* ${i.quantity}x ${i.name}  (${i.price ? (i.price * i.quantity) + ' ر.س' : ''})${i.sauces && i.sauces.length > 0 ? `\n${RLM}  - إضافات: ${i.sauces.join('، ')}` : ''}`).join('\n')}
-${RLM}--------------------------------
-${RLM}المجموع   : ${orderDetails.total_price ? orderDetails.total_price + ' ر.س' : 'غير محدد'}
-${RLM}================================
-${RLM}    نتمنى لك وجبة شهية! 🍕
-${RLM}================================
-`.trim() : orderId;
+  const [origin, setOrigin] = useState('');
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
+
+  const qrValue = origin ? `${origin}/invoice/${orderId}` : `https://cheese1oven.com/invoice/${orderId}`;
 
   // Determine QR Color: Tomato (#ff6347 / Tailwind red-400 equivalent) for pending/preparing. Green (#22c55e) for ready/delivered.
   const qrColor = (status === 'ready' || status === 'delivered') ? '#22c55e' : '#f87171';
