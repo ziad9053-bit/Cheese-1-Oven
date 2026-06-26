@@ -40,13 +40,23 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
     };
   }, [orderId]);
 
-  const qrValue = orderDetails ? `رقم الطلب: ${String(orderDetails.id).includes('-') ? String(orderDetails.id).split('-')[0].toUpperCase() : String(orderDetails.id).toUpperCase()}
-العميل: ${orderDetails.customer_name}
-الوقت: ${new Date(orderDetails.created_at).toLocaleTimeString('ar-SA')}
-الإجمالي: ${orderDetails.total_price ? orderDetails.total_price + ' ريال' : 'غير محدد'}
--------------------
-الأصناف:
-${orderDetails.items?.map((i: any) => `${i.name} (x${i.quantity})`).join('\n')}` : orderId;
+  const qrValue = orderDetails ? `
+================================
+      🧀 CHEESE 1 OVEN 🧀      
+================================
+رقم الطلب : #${String(orderDetails.id).includes('-') ? String(orderDetails.id).split('-')[0].toUpperCase() : String(orderDetails.id).toUpperCase()}
+العميل    : ${orderDetails.customer_name}
+الوقت     : ${new Date(orderDetails.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+النوع     : ${orderDetails.order_type === 'pickup' ? 'استلام من الفرع' : 'توصيل'}
+--------------------------------
+المشتريات:
+${orderDetails.items?.map((i: any) => `* ${i.quantity}x ${i.name}${i.sauces && i.sauces.length > 0 ? `\n  - إضافات: ${i.sauces.join('، ')}` : ''}`).join('\n')}
+--------------------------------
+المجموع   : ${orderDetails.total_price ? orderDetails.total_price + ' ر.س' : 'غير محدد'}
+================================
+    نتمنى لك وجبة شهية! 🍕
+================================
+`.trim() : orderId;
 
   // Determine QR Color: Tomato (#ff6347 / Tailwind red-400 equivalent) for pending/preparing. Green (#22c55e) for ready/delivered.
   const qrColor = (status === 'ready' || status === 'delivered') ? '#22c55e' : '#f87171';
