@@ -203,9 +203,9 @@ export default function DriverPage() {
                             href={selectedOrder.customer_address} 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            className="font-bold text-lg text-blue-400 hover:underline break-all block mt-1"
+                            className="bg-blue-500 hover:bg-blue-400 text-black font-bold text-sm py-2 px-4 rounded-xl flex items-center gap-2 mt-2 transition-all active:scale-95 inline-flex"
                           >
-                            📍 فتح موقع العميل على خرائط جوجل
+                            <MapPin size={16} /> فتح العنوان على ماب
                           </a>
                         ) : (
                           <p className="font-bold text-lg">{selectedOrder.customer_address}</p>
