@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Layers, Home, Clock, CheckCircle, Package, Store, ChefHat } from 'lucide-react';
+import { Layers, Home, Clock, CheckCircle, Package, Store, ChefHat, ArrowRight } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playPopSound } from '@/lib/sounds';
@@ -18,10 +18,16 @@ export default function KitchenPage() {
       .from('orders')
       .select('*')
       .in('status', ['pending', 'preparing'])
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true }); // Oldest first
       
     if (active && !activeErr) {
-      setOrders(prev => JSON.stringify(prev) !== JSON.stringify(active) ? active : prev);
+      // Sort pending above preparing, while keeping time order inside each group
+      const sortedActive = active.sort((a, b) => {
+        if (a.status === 'pending' && b.status === 'preparing') return -1;
+        if (a.status === 'preparing' && b.status === 'pending') return 1;
+        return 0; 
+      });
+      setOrders(prev => JSON.stringify(prev) !== JSON.stringify(sortedActive) ? sortedActive : prev);
     }
 
     // Completed orders (last 20)
@@ -75,18 +81,22 @@ export default function KitchenPage() {
     const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
     if (!error) {
       fetchOrders();
+      if (newStatus === 'ready') {
+        setSelectedOrder(null); // Return to list on mobile when done
+      }
     } else {
       alert('حدث خطأ أثناء تحديث حالة الطلب');
     }
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 flex flex-col md:flex-row gap-6 font-cairo" dir="rtl">
-      {/* Sidebar / List */}
-      <div className="w-full md:w-1/3 lg:w-1/4 flex flex-col gap-6">
+    <div className="min-h-screen bg-black text-white p-4 md:p-6 flex flex-col md:flex-row gap-6 font-cairo" dir="rtl">
+      
+      {/* Sidebar / List - Hidden on mobile if an order is selected */}
+      <div className={`w-full md:w-1/3 lg:w-1/4 flex-col gap-6 ${selectedOrder ? 'hidden md:flex' : 'flex'}`}>
         
         {/* Active Orders Section */}
-        <div className="flex-1 flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 overflow-hidden">
+        <div className="flex-1 flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 overflow-hidden h-[60vh] md:h-auto">
           <div className="flex items-center gap-4 mb-4 pb-4 border-b border-white/10">
             <button 
               onClick={() => window.location.href = '/'}
@@ -104,7 +114,7 @@ export default function KitchenPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar pb-10">
             <AnimatePresence>
               {orders.length === 0 && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-white/40 mt-10 text-sm">
@@ -138,6 +148,12 @@ export default function KitchenPage() {
                     <span>{order.order_type === 'pickup' ? 'استلام' : 'توصيل'} - {order.customer_name}</span>
                   </div>
                   
+                  {/* Time label */}
+                  <div className="text-xs text-white/40 mt-3 flex items-center gap-1">
+                    <Clock size={12} />
+                    تم الطلب: {new Date(order.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute:'2-digit' })}
+                  </div>
+                  
                   {order.status === 'pending' && (
                     <div className="absolute inset-0 bg-red-500/5 blur-xl pointer-events-none" />
                   )}
@@ -148,7 +164,7 @@ export default function KitchenPage() {
         </div>
 
         {/* Completed Orders Section */}
-        <div className="h-[30%] flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 overflow-hidden">
+        <div className="h-[30vh] md:h-[30%] flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 overflow-hidden">
           <div className="mb-4 pb-2 border-b border-white/10">
             <h2 className="text-white/50 text-sm font-bold">الطلبات المنجزة (للمراجعة)</h2>
           </div>
@@ -175,22 +191,34 @@ export default function KitchenPage() {
 
       </div>
 
-      {/* Main Area / Details */}
-      <div className="flex-1 bg-zinc-900 border border-white/10 rounded-3xl p-6 flex flex-col relative overflow-hidden">
+      {/* Main Area / Details - Hidden on mobile if NO order is selected */}
+      <div className={`flex-1 bg-zinc-900 border border-white/10 rounded-3xl p-4 md:p-6 flex-col relative overflow-hidden h-[90vh] md:h-auto ${!selectedOrder ? 'hidden md:flex' : 'flex'}`}>
+        
+        {/* Mobile Back Button */}
+        {selectedOrder && (
+          <button 
+            onClick={() => setSelectedOrder(null)}
+            className="md:hidden flex items-center gap-2 text-white/70 bg-white/5 hover:bg-white/10 p-3 rounded-xl mb-4 transition-all w-fit"
+          >
+            <ArrowRight size={18} />
+            العودة للقائمة
+          </button>
+        )}
+
         {selectedOrder ? (
           <div className="h-full flex flex-col">
-            <div className="flex justify-between items-start mb-8 pb-6 border-b border-white/10">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-6 md:mb-8 pb-6 border-b border-white/10 gap-4">
               <div>
-                <h2 className="text-2xl font-black mb-2 flex items-center gap-3">
+                <h2 className="text-2xl md:text-3xl font-black mb-2 flex items-center gap-3">
                   طلب #{String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
-                  <span className={`text-xs px-3 py-1 rounded-full border ${
+                  <span className={`text-xs px-3 py-1 rounded-full border hidden md:inline-block ${
                     selectedOrder.order_type === 'pickup' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                   }`}>
                     {selectedOrder.order_type === 'pickup' ? 'استلام من المحل' : 'توصيل للسائق'}
                   </span>
                   
                   {/* Status Badge */}
-                  <span className={`text-xs px-3 py-1 rounded-full border ${
+                  <span className={`text-xs px-3 py-1 rounded-full border hidden md:inline-block ${
                     selectedOrder.status === 'pending' ? 'bg-red-500/10 text-red-400 border-red-500/20' 
                     : selectedOrder.status === 'preparing' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20'
                     : 'bg-green-500/10 text-green-400 border-green-500/20'
@@ -200,14 +228,33 @@ export default function KitchenPage() {
                     : 'منجز ✔️'}
                   </span>
                 </h2>
-                <div className="text-white/60 text-sm space-y-1 mt-4 bg-black/40 p-4 rounded-xl border border-white/5 inline-block min-w-[250px]">
+                
+                {/* Mobile Badges */}
+                <div className="flex md:hidden gap-2 mb-2">
+                  <span className={`text-xs px-3 py-1 rounded-full border ${
+                    selectedOrder.order_type === 'pickup' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                  }`}>
+                    {selectedOrder.order_type === 'pickup' ? 'استلام من المحل' : 'توصيل للسائق'}
+                  </span>
+                  <span className={`text-xs px-3 py-1 rounded-full border ${
+                    selectedOrder.status === 'pending' ? 'bg-red-500/10 text-red-400 border-red-500/20' 
+                    : selectedOrder.status === 'preparing' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20'
+                    : 'bg-green-500/10 text-green-400 border-green-500/20'
+                  }`}>
+                    {selectedOrder.status === 'pending' ? 'بانتظار البدء' 
+                    : selectedOrder.status === 'preparing' ? 'قيد التجهيز الآن'
+                    : 'منجز ✔️'}
+                  </span>
+                </div>
+
+                <div className="text-white/60 text-sm space-y-1 mt-2 md:mt-4 bg-black/40 p-4 rounded-xl border border-white/5 inline-block w-full md:min-w-[250px]">
                   <p>العميل: <strong className="text-white">{selectedOrder.customer_name}</strong></p>
                   <p>الجوال: <a href={`tel:${selectedOrder.customer_phone}`} className="text-blue-400 hover:underline">{selectedOrder.customer_phone}</a></p>
                   {selectedOrder.order_type === 'delivery' && <p>العنوان: {selectedOrder.customer_address}</p>}
                 </div>
               </div>
               
-              <div className="text-center bg-black/40 px-6 py-3 rounded-2xl border border-white/5">
+              <div className="text-center bg-black/40 px-6 py-3 rounded-2xl border border-white/5 w-full md:w-auto">
                 <p className="text-white/40 text-xs mb-1">وقت الطلب</p>
                 <p className="font-bold text-xl">{new Date(selectedOrder.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute:'2-digit' })}</p>
               </div>
@@ -270,7 +317,7 @@ export default function KitchenPage() {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-white/20 space-y-4">
             <Layers size={64} />
-            <p className="text-xl font-bold">اختر طلباً من القائمة لعرض تفاصيله والبدء به</p>
+            <p className="text-xl font-bold text-center">اختر طلباً من القائمة<br/>لعرض تفاصيله والبدء به</p>
           </div>
         )}
       </div>
