@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, ShoppingBag, Truck, CheckCircle2, X, ChefHat, Bike } from 'lucide-react';
+import { Flame, ShoppingBag, Truck, CheckCircle2, X, ChefHat, Bike, Star } from 'lucide-react';
 import QRCode from "react-qr-code";
 
 interface OrderTrackingScreenProps {
@@ -16,14 +16,20 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
   const [orderType, setOrderType] = useState<string>('pickup');
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const [origin, setOrigin] = useState('');
+  const [googleMapsUrl, setGoogleMapsUrl] = useState<string>('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setOrigin(window.location.origin);
     }
-  }, []);
 
-  useEffect(() => {
+    // Fetch google maps url
+    supabase.from('store_roles').select('pin_code').eq('role_name', 'google_maps_url').single().then(({ data }) => {
+      if (data && data.pin_code) {
+        setGoogleMapsUrl(data.pin_code);
+      }
+    });
+
     const fetchStatus = async () => {
       const { data, error } = await supabase.from('orders').select('*').eq('id', orderId).single();
       if (data) {
@@ -181,6 +187,30 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
           <p className="text-white/40 text-xs mt-6">
             امسح الكود لعرض فاتورة الطلب الاحترافية التفصيلية
           </p>
+
+          {status === 'delivered' && googleMapsUrl && (
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.5, type: 'spring' }}
+              className="mt-6 w-full max-w-sm mx-auto"
+            >
+              <a 
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 rounded-2xl p-4 transition-all group"
+              >
+                <div className="flex justify-center gap-1 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={24} className="text-yellow-400 fill-yellow-400 group-hover:scale-110 transition-transform" style={{ transitionDelay: `${i * 50}ms` }} />
+                  ))}
+                </div>
+                <p className="text-yellow-400 font-bold text-lg text-center">قيمنا على جوجل ماب</p>
+                <p className="text-yellow-500/60 text-xs text-center mt-1">رأيك يهمنا ويساعدنا على تقديم الأفضل</p>
+              </a>
+            </motion.div>
+          )}
         </motion.div>
 
       </div>

@@ -1216,6 +1216,35 @@ export default function AdminClient({ initialProducts, initialCategories }: {
               <ImageProcessor/>
             </div>
           )}
+          
+          {/* SETTINGS */}
+          {section === 'settings' && (
+            <div className="space-y-5">
+              <h2 className="text-xl font-black">إعدادات المتجر</h2>
+              <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 space-y-4 shadow-xl">
+                <div>
+                  <label className="block text-sm font-bold text-white/70 mb-2">رابط تقييم جوجل ماب (يظهر للعميل بعد استلام الطلب)</label>
+                  <input 
+                    type="url"
+                    value={googleMapsUrl}
+                    onChange={e => setGoogleMapsUrl(e.target.value)}
+                    placeholder="https://maps.google.com/..."
+                    className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-pink-500 transition-colors"
+                  />
+                  <p className="text-xs text-white/40 mt-2">اترك الحقل فارغاً إذا كنت لا تريد إظهار زر التقييم للعملاء.</p>
+                </div>
+                
+                <button 
+                  onClick={saveSettings}
+                  disabled={savingSettings}
+                  className="w-full bg-pink-600 hover:bg-pink-500 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                  {savingSettings ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
+                  {savingSettings ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
+                </button>
+              </div>
+            </div>
+          )}
 
       </div>
       )}
