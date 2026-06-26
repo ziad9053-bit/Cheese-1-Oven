@@ -309,11 +309,21 @@ export default function KitchenPage() {
                 </button>
               )}
 
-              {['ready', 'out_for_delivery', 'delivered'].includes(selectedOrder.status) && (
+              {['out_for_delivery', 'delivered'].includes(selectedOrder.status) && (
                 <div className="w-full bg-black/40 text-white/40 font-bold text-lg py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 border border-white/5">
                   <CheckCircle size={24} />
-                  تم التجهيز سابقاً
+                  دورة حياة الطلب منتهية (مكتمل)
                 </div>
+              )}
+              
+              {selectedOrder.status === 'ready' && (
+                <button 
+                  onClick={() => updateStatus(selectedOrder.id, 'delivered')}
+                  className="w-full bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl shadow-[0_0_40px_rgba(59,130,246,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                >
+                  <Package size={28} />
+                  تم تسليم الطلب للعميل 🤝
+                </button>
               )}
             </div>
           </div>
