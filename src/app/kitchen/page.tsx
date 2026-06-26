@@ -96,7 +96,7 @@ export default function KitchenPage() {
       <div className={`w-full md:w-1/3 lg:w-1/4 flex-col gap-6 ${selectedOrder ? 'hidden md:flex' : 'flex'}`}>
         
         {/* Active Orders Section */}
-        <div className="flex-1 flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 overflow-hidden h-[60vh] md:h-auto">
+        <div className="flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 md:flex-1 md:overflow-hidden md:h-auto min-h-[400px]">
           <div className="flex items-center gap-4 mb-4 pb-4 border-b border-white/10">
             <button 
               onClick={() => window.location.href = '/'}
@@ -164,7 +164,7 @@ export default function KitchenPage() {
         </div>
 
         {/* Completed Orders Section */}
-        <div className="h-[30vh] md:h-[30%] flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 overflow-hidden">
+        <div className="flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 md:h-[30%] min-h-[200px] md:overflow-hidden">
           <div className="mb-4 pb-2 border-b border-white/10">
             <h2 className="text-white/50 text-sm font-bold">الطلبات المنجزة (للمراجعة)</h2>
           </div>
@@ -192,7 +192,7 @@ export default function KitchenPage() {
       </div>
 
       {/* Main Area / Details - Hidden on mobile if NO order is selected */}
-      <div className={`flex-1 bg-zinc-900 border border-white/10 rounded-3xl p-4 md:p-6 flex-col relative overflow-hidden h-[90vh] md:h-auto ${!selectedOrder ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`flex-1 bg-zinc-900 border border-white/10 rounded-3xl p-4 md:p-6 flex-col relative md:overflow-hidden ${!selectedOrder ? 'hidden md:flex' : 'flex'}`}>
         
         {/* Mobile Back Button */}
         {selectedOrder && (
@@ -206,8 +206,8 @@ export default function KitchenPage() {
         )}
 
         {selectedOrder ? (
-          <div className="h-full flex flex-col">
-            <div className="flex flex-col md:flex-row justify-between items-start mb-6 md:mb-8 pb-6 border-b border-white/10 gap-4">
+          <div className="flex-1 flex flex-col h-full min-h-[60vh]">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-6 md:mb-8 pb-6 border-b border-white/10 gap-4 shrink-0">
               <div>
                 <h2 className="text-2xl md:text-3xl font-black mb-2 flex items-center gap-3">
                   طلب #{String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
@@ -254,13 +254,13 @@ export default function KitchenPage() {
                 </div>
               </div>
               
-              <div className="text-center bg-black/40 px-6 py-3 rounded-2xl border border-white/5 w-full md:w-auto">
+              <div className="text-center bg-black/40 px-6 py-3 rounded-2xl border border-white/5 w-full md:w-auto shrink-0">
                 <p className="text-white/40 text-xs mb-1">وقت الطلب</p>
                 <p className="font-bold text-xl">{new Date(selectedOrder.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute:'2-digit' })}</p>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto mb-6 pr-2">
+            <div className="flex-1 md:overflow-y-auto mb-6 pr-2">
               <h3 className="text-lg font-bold text-white/80 mb-4">الأصناف المطلوبة</h3>
               <div className="space-y-3">
                 {selectedOrder.items?.map((item: any, idx: number) => (
@@ -271,7 +271,7 @@ export default function KitchenPage() {
                         <p className="text-sm text-white/50 mt-1">الإضافات: {item.sauces.join('، ')}</p>
                       )}
                     </div>
-                    <div className="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center font-black text-xl">
+                    <div className="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center font-black text-xl shrink-0 ml-2">
                       x{item.quantity}
                     </div>
                   </div>
@@ -286,33 +286,35 @@ export default function KitchenPage() {
               )}
             </div>
 
-            {/* Action Buttons based on status */}
-            {selectedOrder.status === 'pending' && (
-              <button 
-                onClick={() => updateStatus(selectedOrder.id, 'preparing')}
-                className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black text-xl py-6 rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-              >
-                <ChefHat size={28} />
-                البدء بالتجهيز
-              </button>
-            )}
-            
-            {selectedOrder.status === 'preparing' && (
-              <button 
-                onClick={() => updateStatus(selectedOrder.id, 'ready')}
-                className="w-full bg-green-500 hover:bg-green-400 text-black font-black text-xl py-6 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-              >
-                <CheckCircle size={28} />
-                الانتهاء من التجهيز ✔️
-              </button>
-            )}
+            {/* Action Buttons based on status - Sticky to bottom on mobile */}
+            <div className="sticky bottom-0 bg-zinc-900 pt-4 pb-2 border-t border-white/10 mt-auto z-20">
+              {selectedOrder.status === 'pending' && (
+                <button 
+                  onClick={() => updateStatus(selectedOrder.id, 'preparing')}
+                  className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black text-xl py-6 rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                >
+                  <ChefHat size={28} />
+                  البدء بالتجهيز
+                </button>
+              )}
+              
+              {selectedOrder.status === 'preparing' && (
+                <button 
+                  onClick={() => updateStatus(selectedOrder.id, 'ready')}
+                  className="w-full bg-green-500 hover:bg-green-400 text-black font-black text-xl py-6 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                >
+                  <CheckCircle size={28} />
+                  الانتهاء من التجهيز ✔️
+                </button>
+              )}
 
-            {['ready', 'out_for_delivery', 'delivered'].includes(selectedOrder.status) && (
-              <div className="w-full bg-black/40 text-white/40 font-bold text-lg py-6 rounded-2xl flex items-center justify-center gap-3 border border-white/5">
-                <CheckCircle size={24} />
-                تم التجهيز سابقاً
-              </div>
-            )}
+              {['ready', 'out_for_delivery', 'delivered'].includes(selectedOrder.status) && (
+                <div className="w-full bg-black/40 text-white/40 font-bold text-lg py-6 rounded-2xl flex items-center justify-center gap-3 border border-white/5">
+                  <CheckCircle size={24} />
+                  تم التجهيز سابقاً
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-white/20 space-y-4">
