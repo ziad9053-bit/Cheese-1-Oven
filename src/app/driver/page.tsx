@@ -157,11 +157,11 @@ export default function DriverPage() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        updateStatus(order.id, 'delivered');
+                        setSelectedOrder(order);
                       }}
-                      className="w-full bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/30 rounded-xl py-2 flex items-center justify-center gap-2 text-sm font-bold transition-all"
+                      className="w-full bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-black border border-blue-500/30 rounded-xl py-2 flex items-center justify-center gap-2 text-sm font-bold transition-all"
                     >
-                      <CheckCircle size={16} /> تم التسليم
+                      <Package size={16} /> فتح تفاصيل الطلب
                     </button>
                   )}
                 </div>
