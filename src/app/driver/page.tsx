@@ -132,12 +132,16 @@ export default function DriverPage() {
                 </div>
                 {order.status === 'out_for_delivery' ? (
                   <div className="flex items-center gap-2 text-sm text-white/70">
-                    <MapPin size={14} className="text-blue-400" />
-                    <span className="truncate">{order.customer_address}</span>
+                    <MapPin size={14} className="text-blue-400 shrink-0" />
+                    {order.customer_address.startsWith('http') ? (
+                      <span className="text-blue-400">موقع ماب (اضغط للفتح من التفاصيل)</span>
+                    ) : (
+                      <span className="truncate">{order.customer_address}</span>
+                    )}
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-sm text-white/40">
-                    <Lock size={12} />
+                    <Lock size={12} className="shrink-0" />
                     <span>العنوان محمي حالياً</span>
                   </div>
                 )}
@@ -194,7 +198,18 @@ export default function DriverPage() {
                       </div>
                       <div>
                         <p className="text-xs text-blue-400/50">عنوان التوصيل</p>
-                        <p className="font-bold text-lg">{selectedOrder.customer_address}</p>
+                        {selectedOrder.customer_address.startsWith('http') ? (
+                          <a 
+                            href={selectedOrder.customer_address} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="font-bold text-lg text-blue-400 hover:underline break-all block mt-1"
+                          >
+                            📍 فتح موقع العميل على خرائط جوجل
+                          </a>
+                        ) : (
+                          <p className="font-bold text-lg">{selectedOrder.customer_address}</p>
+                        )}
                       </div>
                     </div>
                   </div>

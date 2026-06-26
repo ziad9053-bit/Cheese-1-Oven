@@ -319,20 +319,6 @@ export default function KitchenPage() {
                       <p className="text-sm whitespace-pre-wrap">{selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').trim()}</p>
                     </div>
                   )}
-                  {selectedOrder.notes.includes('[DOOR_IMAGE]') && (
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-                      <h4 className="font-bold text-sm mb-3 flex items-center gap-2 text-white/80">
-                        <Package size={16} /> صورة باب المنزل
-                      </h4>
-                      <div className="rounded-xl overflow-hidden border border-white/10">
-                        <img 
-                          src={selectedOrder.notes.match(/\[DOOR_IMAGE\](.*?)\[\/DOOR_IMAGE\]/)?.[1] || ''} 
-                          alt="صورة الباب" 
-                          className="w-full h-auto object-cover max-h-[300px]"
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
