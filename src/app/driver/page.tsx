@@ -16,7 +16,7 @@ export default function DriverPage() {
         .from('orders')
         .select('*')
         .eq('order_type', 'delivery')
-        .in('status', ['ready', 'out_for_delivery'])
+        .in('status', ['pending', 'preparing', 'ready', 'out_for_delivery'])
         .order('created_at', { ascending: true });
         
       if (data && !error) {
@@ -35,7 +35,7 @@ export default function DriverPage() {
     const sub = supabase.channel('driver_orders')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: 'order_type=eq.delivery' }, (payload) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-          if (['ready', 'out_for_delivery'].includes(payload.new.status)) {
+          if (['pending', 'preparing', 'ready', 'out_for_delivery'].includes(payload.new.status)) {
             setOrders(prev => {
               const exists = prev.find(o => o.id === payload.new.id);
               if (!exists && payload.new.status === 'ready') playPopSound();
@@ -119,29 +119,37 @@ export default function DriverPage() {
                 <div className="flex justify-between items-start mb-2">
                   <span className="font-bold font-mono">#{String(order.id).includes('-') ? String(order.id).split('-')[0].toUpperCase() : String(order.id).toUpperCase()}</span>
                   <span className={`text-xs px-2 py-1 rounded-full ${
-                    order.status === 'out_for_delivery' ? 'bg-orange-500/20 text-orange-400' : 'bg-green-500/20 text-green-400'
+                    order.status === 'pending' ? 'bg-red-500/20 text-red-400' 
+                    : order.status === 'preparing' ? 'bg-orange-500/20 text-orange-400'
+                    : order.status === 'ready' ? 'bg-yellow-500/20 text-yellow-400'
+                    : 'bg-green-500/20 text-green-400'
                   }`}>
-                    {order.status === 'out_for_delivery' ? 'في الطريق' : 'جاهز للتوصيل'}
+                    {order.status === 'pending' ? 'بانتظار البدء' 
+                    : order.status === 'preparing' ? 'قيد التجهيز'
+                    : order.status === 'ready' ? 'جاهز (بانتظار المطبخ)'
+                    : 'في الطريق إليك'}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-white/70">
-                  <MapPin size={14} className="text-blue-400" />
-                  <span className="truncate">{order.customer_address}</span>
-                </div>
+                {order.status === 'out_for_delivery' ? (
+                  <div className="flex items-center gap-2 text-sm text-white/70">
+                    <MapPin size={14} className="text-blue-400" />
+                    <span className="truncate">{order.customer_address}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-white/40">
+                    <Lock size={12} />
+                    <span>العنوان محمي حالياً</span>
+                  </div>
+                )}
 
                 {/* Quick Action Buttons for Mobile/Fast workflow */}
                 <div className="mt-3 flex gap-2">
-                  {order.status === 'ready' ? (
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        updateStatus(order.id, 'out_for_delivery');
-                      }}
-                      className="w-full bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-black border border-blue-500/30 rounded-xl py-2 flex items-center justify-center gap-2 text-sm font-bold transition-all"
-                    >
-                      <Truck size={16} /> استلام للبدء
-                    </button>
-                  ) : (
+                  {order.status === 'ready' && (
+                    <div className="w-full bg-zinc-800/50 text-white/50 border border-white/5 rounded-xl py-2 flex items-center justify-center gap-2 text-sm font-bold">
+                      <ChefHat size={16} /> بانتظار تسليم المطبخ
+                    </div>
+                  )}
+                  {order.status === 'out_for_delivery' && (
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
