@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Layers, Home, Clock, CheckCircle, Package, Store, ChefHat, ArrowRight } from 'lucide-react';
+import { Layers, Home, Clock, CheckCircle, Package, Store, ChefHat, ArrowRight, Truck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from "react-qr-code";
