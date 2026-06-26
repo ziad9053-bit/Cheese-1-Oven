@@ -84,6 +84,10 @@ export default function KitchenPage() {
     // Optimistic UI update so the button changes instantly!
     if (selectedOrder && selectedOrder.id === id) {
       setSelectedOrder({ ...selectedOrder, status: newStatus });
+      
+      if (newStatus === 'delivered') {
+        setTimeout(() => setSelectedOrder(null), 800);
+      }
     }
 
     const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
