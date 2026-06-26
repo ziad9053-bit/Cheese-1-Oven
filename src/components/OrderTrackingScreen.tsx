@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { motion } from 'framer-motion';
-import { ChefHat, CheckCircle, Package, ArrowRight, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Flame, ShoppingBag, Truck, CheckCircle2, X, ChefHat, Bike } from 'lucide-react';
 import QRCode from "react-qr-code";
 
 interface OrderTrackingScreenProps {
@@ -15,6 +15,13 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
   const [status, setStatus] = useState<string>('pending');
   const [orderType, setOrderType] = useState<string>('pickup');
   const [orderDetails, setOrderDetails] = useState<any>(null);
+  const [origin, setOrigin] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -40,99 +47,143 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
     };
   }, [orderId]);
 
-  const [origin, setOrigin] = useState('');
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setOrigin(window.location.origin);
-    }
-  }, []);
-
   const qrValue = origin ? `${origin}/invoice/${orderId}` : `https://cheese1oven.com/invoice/${orderId}`;
+  const shortId = String(orderId).includes('-') ? String(orderId).split('-')[0].toUpperCase() : String(orderId).toUpperCase();
 
-  // Determine QR Color: Tomato (#ff6347 / Tailwind red-400 equivalent) for pending/preparing. Green (#22c55e) for ready/delivered.
-  const qrColor = (status === 'ready' || status === 'delivered') ? '#22c55e' : '#f87171';
+  // Define Steps based on order type
+  const steps = orderType === 'pickup' 
+    ? [
+        { id: 'preparing', label: 'قيد التجهيز', icon: Flame, match: ['pending', 'preparing'] },
+        { id: 'ready', label: 'جاهز للاستلام', icon: ShoppingBag, match: ['ready'] },
+        { id: 'delivered', label: 'تم الاستلام', icon: CheckCircle2, match: ['delivered'] }
+      ]
+    : [
+        { id: 'preparing', label: 'قيد التجهيز', icon: Flame, match: ['pending', 'preparing'] },
+        { id: 'ready', label: 'بانتظار السائق', icon: ShoppingBag, match: ['ready'] },
+        { id: 'out_for_delivery', label: 'جاري التوصيل', icon: Truck, match: ['out_for_delivery'] },
+        { id: 'delivered', label: 'تم التوصيل', icon: CheckCircle2, match: ['delivered'] }
+      ];
+
+  const currentStepIndex = steps.findIndex(s => s.match.includes(status)) !== -1 
+    ? steps.findIndex(s => s.match.includes(status)) 
+    : 0;
 
   return (
-    <div className="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center p-6" dir="rtl">
+    <div className="fixed inset-0 bg-[#0a0a0a] z-[200] flex flex-col items-center justify-start pt-16 px-6 overflow-y-auto custom-scrollbar" dir="rtl">
+      
+      {/* Close Button */}
       <button 
         onClick={onClose}
-        className="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/20 transition-colors"
+        className="absolute top-6 right-6 w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all backdrop-blur-md"
       >
-        <X size={24} />
+        <X size={20} />
       </button>
 
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-zinc-900 border border-white/10 rounded-3xl p-8 max-w-sm w-full text-center space-y-8 overflow-y-auto max-h-[90vh] custom-scrollbar"
-      >
-        <div className="space-y-4">
-          <p className="text-white/50 text-sm font-bold tracking-widest">حالة الطلب</p>
-          
-          {status === 'pending' || status === 'preparing' ? (
-            <motion.div 
-              animate={{ y: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-              className="w-24 h-24 mx-auto bg-orange-500/20 text-orange-500 rounded-full flex items-center justify-center border-4 border-orange-500/30"
-            >
-              <ChefHat size={48} />
-            </motion.div>
-          ) : status === 'out_for_delivery' ? (
-            <motion.div 
-              animate={{ x: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-              className="w-24 h-24 mx-auto bg-blue-500/20 text-blue-500 rounded-full flex items-center justify-center border-4 border-blue-500/30"
-            >
-              <Package size={48} />
-            </motion.div>
-          ) : (
-            <motion.div 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="w-24 h-24 mx-auto bg-green-500/20 text-green-500 rounded-full flex items-center justify-center border-4 border-green-500/30"
-            >
-              <CheckCircle size={48} />
-            </motion.div>
-          )}
-
-          <h2 className="text-3xl font-black text-white">
-            {status === 'pending' || status === 'preparing' 
-              ? 'قيد التجهيز 👨‍🍳' 
-              : status === 'out_for_delivery'
-                ? 'جاري التوصيل 🛵'
-                : status === 'delivered'
-                  ? 'تم التوصيل! 🎉'
-                  : 'طلبك جاهز! 🎉'}
-          </h2>
-          
-          <p className="text-white/60">
-            {status === 'pending' || status === 'preparing' 
-              ? 'يتم الآن تحضير طلبك بكل حب واهتمام في المطبخ.'
-              : status === 'out_for_delivery'
-                ? 'السائق في الطريق إليك الآن، استعد لاستلام طلبك الساخن.'
-                : status === 'delivered'
-                  ? 'تم تسليم طلبك بنجاح. بالعافية!'
-                  : orderType === 'pickup' 
-                    ? 'طلبك جاهز الآن، بانتظار وصولك لاستلامه من المحل 🚗'
-                    : 'طلبك جاهز، وبانتظار استلام السائق له لتوصيله 🛵'
-            }
-          </p>
+      <div className="w-full max-w-md space-y-8 pb-12">
+        
+        {/* Header Title */}
+        <div className="text-center space-y-2">
+          <h2 className="text-3xl font-black text-white tracking-tight">تتبع الطلب</h2>
+          <p className="text-white/40 text-sm">شاشتك الحية لمعرفة حالة طلبك خطوة بخطوة</p>
         </div>
 
-        <div className="bg-black/40 rounded-2xl p-6 border border-white/5 flex flex-col items-center justify-center">
-          <p className="text-white/50 text-xs mb-4 font-bold">باركود الطلب</p>
-          <div className="bg-white p-3 rounded-2xl inline-block shadow-xl">
+        {/* Timeline Stepper */}
+        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 relative">
+          <div className="absolute top-0 bottom-0 right-[47px] w-[2px] bg-white/5 rounded-full" />
+          
+          <div className="space-y-8 relative z-10">
+            {steps.map((step, idx) => {
+              const isActive = idx === currentStepIndex;
+              const isPast = idx < currentStepIndex;
+              const Icon = step.icon;
+
+              return (
+                <div key={step.id} className="flex items-center gap-6 relative">
+                  {/* Line Connection Highlight */}
+                  {isPast && (
+                    <motion.div 
+                      initial={{ height: 0 }}
+                      animate={{ height: '100%' }}
+                      className="absolute top-10 right-[15px] w-[2px] bg-emerald-500 rounded-full origin-top"
+                    />
+                  )}
+
+                  {/* Icon Circle */}
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border transition-all duration-500 z-10 ${
+                    isActive 
+                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.2)]' 
+                      : isPast 
+                        ? 'bg-emerald-500 border-emerald-500 text-black' 
+                        : 'bg-[#121212] border-white/10 text-white/20'
+                  }`}>
+                    {isActive ? (
+                      <motion.div
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ repeat: Infinity, duration: 2 }}
+                      >
+                        <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+                      </motion.div>
+                    ) : (
+                      <Icon size={18} strokeWidth={isPast ? 2.5 : 2} />
+                    )}
+                  </div>
+
+                  {/* Label */}
+                  <div>
+                    <h3 className={`font-bold text-lg transition-colors duration-300 ${
+                      isActive ? 'text-white' : isPast ? 'text-white/80' : 'text-white/30'
+                    }`}>
+                      {step.label}
+                    </h3>
+                    {isActive && (
+                      <motion.p 
+                        initial={{ opacity: 0, y: -5 }} 
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-emerald-500/70 text-xs mt-1 font-medium"
+                      >
+                        الآن قيد التنفيذ
+                      </motion.p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* QR Code Glassmorphism Card */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] rounded-3xl p-6 text-center"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <div className="text-right">
+              <p className="text-white/40 text-xs font-medium mb-1">رقم الطلب</p>
+              <p className="text-white font-mono font-bold text-lg tracking-widest">#{shortId}</p>
+            </div>
+            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs text-white/70">
+              {orderDetails ? (orderDetails.order_type === 'pickup' ? 'استلام من الفرع' : 'توصيل') : 'جاري التحميل...'}
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded-2xl inline-block shadow-2xl relative group">
+            <div className="absolute inset-0 bg-emerald-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <QRCode 
               value={qrValue} 
-              size={140} 
-              fgColor={qrColor}
+              size={160} 
+              fgColor={status === 'delivered' ? '#10b981' : '#0a0a0a'} 
+              className="relative z-10"
             />
           </div>
-          <p className="text-white/40 font-mono font-bold mt-4 text-xs tracking-widest">
-            #{String(orderId).includes('-') ? String(orderId).split('-')[0].toUpperCase() : String(orderId).toUpperCase()}
+          
+          <p className="text-white/40 text-xs mt-6">
+            امسح الكود لعرض فاتورة الطلب الاحترافية التفصيلية
           </p>
-        </div>
-      </motion.div>
+        </motion.div>
+
+      </div>
     </div>
   );
 }
