@@ -181,9 +181,15 @@ export default function KitchenPage() {
                   selectedOrder?.id === order.id ? 'bg-white/10 border-white/20' : 'bg-black/20 border-white/5 hover:bg-white/5'
                 }`}
               >
-                <div className="flex justify-between items-center opacity-50">
+                <div className="flex justify-between items-center opacity-80">
                   <span className="font-bold font-mono text-xs">#{String(order.id).includes('-') ? String(order.id).split('-')[0].toUpperCase() : String(order.id).toUpperCase()}</span>
-                  <CheckCircle size={14} className="text-green-500" />
+                  {order.status === 'delivered' ? (
+                    <CheckCircle size={14} className="text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+                  ) : order.status === 'ready' ? (
+                    <CheckCircle size={14} className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]" />
+                  ) : (
+                    <CheckCircle size={14} className="text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.4)]" />
+                  )}
                 </div>
               </button>
             ))}
