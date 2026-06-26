@@ -159,7 +159,7 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
           className="bg-white/[0.02] backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] rounded-3xl p-5 text-center relative overflow-hidden"
         >
           {/* Subtle glow effect behind QR */}
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 ${status === 'ready' || status === 'delivered' ? 'bg-emerald-500/10' : 'bg-red-500/10'} blur-3xl rounded-full pointer-events-none transition-colors duration-700`} />
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 ${status === 'ready' ? 'bg-blue-500/10' : status === 'delivered' ? 'bg-emerald-500/10' : 'bg-red-500/10'} blur-3xl rounded-full pointer-events-none transition-colors duration-700`} />
 
           <div className="flex justify-between items-center mb-5 relative z-10">
             <div className="text-right">
@@ -175,7 +175,11 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
             <QRCode 
               value={qrValue} 
               size={130} 
-              fgColor={status === 'ready' || status === 'delivered' ? '#10b981' : '#f87171'} 
+              fgColor={
+                status === 'delivered' ? '#10b981' : 
+                status === 'ready' ? '#3b82f6' : 
+                '#ef4444'
+              } 
             />
           </div>
           
