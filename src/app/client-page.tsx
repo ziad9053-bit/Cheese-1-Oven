@@ -355,18 +355,27 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
 
             // Map items
             const mappedItems = [
-              ...cartItems.map(item => ({
-                type: 'product',
-                id: item.product.id,
-                name: item.product.name,
-                quantity: item.quantity,
-                sauces: item.selectedSauceIds.map(id => sauces.find(s => s.id === id)?.name)
-              })),
+              ...cartItems.map(item => {
+                const productPrice = item.product.price;
+                const saucesPrice = item.selectedSauceIds.reduce((sum, id) => {
+                  const sauce = sauces.find(s => s.id === id);
+                  return sum + (sauce ? sauce.price : 0);
+                }, 0);
+                return {
+                  type: 'product',
+                  id: item.product.id,
+                  name: item.product.name,
+                  quantity: item.quantity,
+                  price: productPrice + saucesPrice,
+                  sauces: item.selectedSauceIds.map(id => sauces.find(s => s.id === id)?.name)
+                };
+              }),
               ...drinkItems.map(item => ({
                 type: 'drink',
                 id: item.drink.id,
                 name: item.drink.name,
-                quantity: item.quantity
+                quantity: item.quantity,
+                price: item.drink.price
               }))
             ];
 
