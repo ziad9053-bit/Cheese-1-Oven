@@ -387,7 +387,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
               notes: data.notes || null,
               items: mappedItems,
               total_price,
-              status: 'preparing'
+              status: 'pending'
             }]).select().single();
 
             if (error) {
