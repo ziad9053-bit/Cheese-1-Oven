@@ -546,6 +546,33 @@ export default function AdminClient({ initialProducts, initialCategories }: {
   const [confirmDel, setConfirmDel]     = useState<{ type: 'product'|'category'|'sauce'; id: any } | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
+  
+  // Settings State
+  const [googleMapsUrl, setGoogleMapsUrl] = useState('');
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  // Fetch initial settings
+  React.useEffect(() => {
+    supabase.from('store_roles').select('pin_code').eq('role_name', 'google_maps_url').single().then(({ data }) => {
+      if (data) setGoogleMapsUrl(data.pin_code);
+    });
+  }, []);
+
+  const saveSettings = async () => {
+    setSavingSettings(true);
+    // Upsert the google maps url into store_roles
+    const { error } = await supabase.from('store_roles').upsert({
+      role_name: 'google_maps_url',
+      pin_code: googleMapsUrl || ''
+    }, { onConflict: 'role_name' });
+    
+    if (error) {
+      showToast('فشل حفظ الإعدادات - يرجى التأكد من صلاحيات قاعدة البيانات', 'err');
+    } else {
+      showToast('✅ تم حفظ الإعدادات بنجاح', 'ok');
+    }
+    setSavingSettings(false);
+  };
 
   const showToast = (msg: string, type: 'ok'|'err') => {
     setToast({ msg, type });
