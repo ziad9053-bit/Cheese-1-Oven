@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronUp, Trash2, ShoppingBag, Plus, Minus, CreditCard, Sparkles, ArrowRight, MapPin } from 'lucide-react';
+import { ChevronUp, Trash2, ShoppingBag, Plus, Minus, CreditCard, Sparkles, ArrowRight, MapPin, Camera, X } from 'lucide-react';
 import { Product, Sauce, Drink } from '@/lib/data';
 
 interface CartItem {
@@ -61,7 +61,36 @@ export const OrderingBottomSheet: React.FC<Props> = ({
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+  const [doorImage, setDoorImage] = useState<{ url: string, path: string } | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [notes, setNotes] = useState('');
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `door-images/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('path', path);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error('فشل رفع الصورة');
+      const data = await res.json();
+      setDoorImage({ url: data.url, path });
+    } catch (error) {
+      alert('حدث خطأ أثناء رفع الصورة، يرجى المحاولة مرة أخرى.');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   const productsTotal = cartItems.reduce((total, item) => {
     const productPrice = item.product.price;
@@ -324,6 +353,48 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                             placeholder="اسم الحي، الشارع، أو سيتم وضع رابط الموقع هنا..." 
                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary text-right text-sm"
                           />
+                          
+                          <div className="mt-4 p-4 border border-white/10 rounded-xl bg-black/20">
+                            <label className="text-white/70 text-sm font-bold flex items-center justify-between mb-2">
+                              <span>صورة باب المنزل (اختياري)</span>
+                              <Camera size={16} className="text-white/50" />
+                            </label>
+                            <p className="text-white/40 text-[10px] mb-3">ستُحذف الصورة تلقائياً بمجرد إتمام توصيل الطلب لحماية خصوصيتك.</p>
+                            
+                            {doorImage ? (
+                              <div className="relative inline-block w-full h-32 rounded-lg overflow-hidden border border-white/20">
+                                <img src={doorImage.url} alt="Door" className="w-full h-full object-cover" />
+                                <button 
+                                  onClick={async () => {
+                                    setDoorImage(null);
+                                    // Optional: Call /api/delete-image here to clean up immediately if they change their mind
+                                    await fetch('/api/delete-image', {
+                                      method: 'POST',
+                                      body: JSON.stringify({ path: doorImage.path }),
+                                    });
+                                  }}
+                                  className="absolute top-2 left-2 bg-red-500/80 hover:bg-red-500 p-2 rounded-full text-white shadow-lg transition-all"
+                                >
+                                  <X size={16} />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="relative">
+                                <input 
+                                  type="file" 
+                                  accept="image/*" 
+                                  capture="environment"
+                                  onChange={handleImageUpload}
+                                  disabled={isUploadingImage}
+                                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed" 
+                                />
+                                <div className={`flex flex-col items-center justify-center py-6 border-2 border-dashed border-white/20 rounded-lg text-white/50 transition-all ${isUploadingImage ? 'animate-pulse bg-white/5' : 'hover:bg-white/5 hover:border-white/40'}`}>
+                                  <Camera size={24} className="mb-2" />
+                                  <span className="text-xs font-bold">{isUploadingImage ? 'جاري رفع الصورة...' : 'اضغط لالتقاط أو رفع صورة للباب'}</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
 
@@ -366,12 +437,16 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                 return;
               }
               if (onCheckout) {
+                const finalNotes = doorImage 
+                  ? `${notes}\n[DOOR_IMAGE]${doorImage.url}[/DOOR_IMAGE]\n[DOOR_PATH]${doorImage.path}[/DOOR_PATH]` 
+                  : notes;
+
                 onCheckout({
                   orderType,
                   customerName,
                   customerPhone,
                   customerAddress,
-                  notes
+                  notes: finalNotes
                 });
               }
             }}

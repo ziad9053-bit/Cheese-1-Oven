@@ -58,8 +58,20 @@ export default function DriverPage() {
   }, [selectedOrder]);
 
   const updateStatus = async (id: string, newStatus: string) => {
+    if (newStatus === 'delivered' && selectedOrder?.notes?.includes('[DOOR_PATH]')) {
+      const match = selectedOrder.notes.match(/\[DOOR_PATH\](.*?)\[\/DOOR_PATH\]/);
+      if (match && match[1]) {
+        fetch('/api/delete-image', {
+          method: 'POST',
+          body: JSON.stringify({ path: match[1] }),
+        }).catch(console.error);
+      }
+    }
     const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
     if (error) alert('حدث خطأ أثناء تحديث حالة الطلب');
+    if (newStatus === 'delivered' && selectedOrder?.id === id) {
+      setTimeout(() => setSelectedOrder(null), 800);
+    }
   };
 
   return (
@@ -201,9 +213,27 @@ export default function DriverPage() {
               </div>
 
               {selectedOrder.notes && (
-                <div className="mt-6 bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 text-orange-400">
-                  <h4 className="font-bold text-sm mb-1">ملاحظات العميل:</h4>
-                  <p className="text-sm">{selectedOrder.notes}</p>
+                <div className="mt-6 space-y-4">
+                  {selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').trim() && (
+                    <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 text-orange-400">
+                      <h4 className="font-bold text-sm mb-1">ملاحظات العميل:</h4>
+                      <p className="text-sm whitespace-pre-wrap">{selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').trim()}</p>
+                    </div>
+                  )}
+                  {selectedOrder.notes.includes('[DOOR_IMAGE]') && (
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                      <h4 className="font-bold text-sm mb-3 flex items-center gap-2 text-white/80">
+                        <Package size={16} /> صورة باب المنزل
+                      </h4>
+                      <div className="rounded-xl overflow-hidden border border-white/10">
+                        <img 
+                          src={selectedOrder.notes.match(/\[DOOR_IMAGE\](.*?)\[\/DOOR_IMAGE\]/)?.[1] || ''} 
+                          alt="صورة الباب" 
+                          className="w-full h-auto object-cover max-h-[300px]"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
