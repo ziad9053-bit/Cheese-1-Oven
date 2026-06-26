@@ -24,9 +24,9 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
     }
 
     // Fetch google maps url
-    supabase.from('store_roles').select('pin_code').eq('role_name', 'google_maps_url').single().then(({ data }) => {
-      if (data && data.pin_code) {
-        setGoogleMapsUrl(data.pin_code);
+    supabase.from('products').select('description').eq('product_type', 'app_settings').eq('name', 'google_maps_url').single().then(({ data }) => {
+      if (data && data.description) {
+        setGoogleMapsUrl(data.description);
       }
     });
 

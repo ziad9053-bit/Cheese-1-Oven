@@ -553,18 +553,32 @@ export default function AdminClient({ initialProducts, initialCategories }: {
 
   // Fetch initial settings
   React.useEffect(() => {
-    supabase.from('store_roles').select('pin_code').eq('role_name', 'google_maps_url').single().then(({ data }) => {
-      if (data) setGoogleMapsUrl(data.pin_code);
+    supabase.from('products').select('description').eq('product_type', 'app_settings').eq('name', 'google_maps_url').single().then(({ data }) => {
+      if (data && data.description) setGoogleMapsUrl(data.description);
     });
   }, []);
 
   const saveSettings = async () => {
     setSavingSettings(true);
-    // Upsert the google maps url into store_roles
-    const { error } = await supabase.from('store_roles').upsert({
-      role_name: 'google_maps_url',
-      pin_code: googleMapsUrl || ''
-    }, { onConflict: 'role_name' });
+    // Upsert the google maps url into products
+    const { data: existing } = await supabase.from('products').select('id').eq('product_type', 'app_settings').eq('name', 'google_maps_url').single();
+    
+    let error;
+    if (existing) {
+      const res = await supabase.from('products').update({ description: googleMapsUrl || '' }).eq('id', existing.id);
+      error = res.error;
+    } else {
+      const res = await supabase.from('products').insert([{
+        name: 'google_maps_url',
+        description: googleMapsUrl || '',
+        price: 0,
+        image_url: '',
+        category_id: categories[0]?.id ?? 1,
+        product_type: 'app_settings',
+        is_available: false
+      }]);
+      error = res.error;
+    }
     
     if (error) {
       showToast('فشل حفظ الإعدادات - يرجى التأكد من صلاحيات قاعدة البيانات', 'err');
