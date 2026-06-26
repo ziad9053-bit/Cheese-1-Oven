@@ -18,9 +18,12 @@ const fontRighteous = Righteous({ weight: '400', variable: "--font-righteous", s
 const fontBebas = Bebas_Neue({ weight: '400', variable: "--font-bebas", subsets: ["latin"] });
 const fontChewy = Chewy({ weight: '400', variable: "--font-chewy", subsets: ["latin"] });
 
+import { PwaInstallBanner } from "@/components/PwaInstallBanner";
+
 export const metadata: Metadata = {
   title: "Cheese 1 Oven",
-  description: "Pizza and Pastry Ordering",
+  description: "تطبيق مطعم Cheese 1 Oven الفاخر",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -33,6 +36,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${fontPacifico.variable} ${fontLobster.variable} ${fontRighteous.variable} ${fontBebas.variable} ${fontChewy.variable} antialiased bg-black text-white font-sans select-none`}
       >
+        <PwaInstallBanner />
         {children}
       </body>
     </html>

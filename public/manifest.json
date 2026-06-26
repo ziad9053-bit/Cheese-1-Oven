@@ -1,0 +1,17 @@
+{
+  "name": "Cheese 1 Oven",
+  "short_name": "Cheese 1 Oven",
+  "description": "تطبيق مطعم Cheese 1 Oven الفاخر لطلب البيتزا والفطائر",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
