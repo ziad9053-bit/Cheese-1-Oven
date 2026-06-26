@@ -18,14 +18,16 @@ export default function KitchenPage() {
     const { data: active, error: activeErr } = await supabase
       .from('orders')
       .select('*')
-      .in('status', ['pending', 'preparing'])
+      .in('status', ['pending', 'preparing', 'ready'])
       .order('created_at', { ascending: true }); // Oldest first
       
     if (active && !activeErr) {
       // Sort pending above preparing, while keeping time order inside each group
       const sortedActive = active.sort((a, b) => {
-        if (a.status === 'pending' && b.status === 'preparing') return -1;
-        if (a.status === 'preparing' && b.status === 'pending') return 1;
+        if (a.status === 'pending' && b.status !== 'pending') return -1;
+        if (a.status !== 'pending' && b.status === 'pending') return 1;
+        if (a.status === 'preparing' && b.status === 'ready') return -1;
+        if (a.status === 'ready' && b.status === 'preparing') return 1;
         return 0; 
       });
       setOrders(prev => JSON.stringify(prev) !== JSON.stringify(sortedActive) ? sortedActive : prev);
@@ -35,7 +37,7 @@ export default function KitchenPage() {
     const { data: completed, error: completedErr } = await supabase
       .from('orders')
       .select('*')
-      .in('status', ['ready', 'out_for_delivery', 'delivered'])
+      .in('status', ['delivered', 'out_for_delivery'])
       .order('updated_at', { ascending: false })
       .limit(20);
 
@@ -141,9 +143,13 @@ export default function KitchenPage() {
                   <div className="flex justify-between items-start mb-2 relative z-10">
                     <span className="font-bold font-mono">#{String(order.id).includes('-') ? String(order.id).split('-')[0].toUpperCase() : String(order.id).toUpperCase()}</span>
                     <span className={`text-xs px-2 py-1 rounded-full font-bold ${
-                      order.status === 'pending' ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-orange-500/20 text-orange-400'
+                      order.status === 'pending' ? 'bg-red-500/20 text-red-400 animate-pulse' : 
+                      order.status === 'preparing' ? 'bg-orange-500/20 text-orange-400' :
+                      'bg-yellow-500/20 text-yellow-400'
                     }`}>
-                      {order.status === 'pending' ? 'طلب جديد 🔥' : 'قيد التجهيز 👨‍🍳'}
+                      {order.status === 'pending' ? 'طلب جديد 🔥' : 
+                       order.status === 'preparing' ? 'قيد التجهيز 👨‍🍳' :
+                       'بانتظار التسليم 📦'}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-white/70 relative z-10">
@@ -166,33 +172,7 @@ export default function KitchenPage() {
           </div>
         </div>
 
-        {/* Ready Orders Section (Waiting for Delivery) */}
-        <div className="flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 md:h-[25%] min-h-[150px] md:overflow-hidden">
-          <div className="mb-4 pb-2 border-b border-white/10">
-            <h2 className="text-yellow-500/90 text-sm font-bold flex items-center gap-2">
-              <Package size={14} /> بانتظار تسليم العميل
-            </h2>
-          </div>
-          <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-            {completedOrders.filter(o => o.status === 'ready' || o.status === 'out_for_delivery').length === 0 && (
-              <div className="text-center text-white/20 text-xs mt-4">لا توجد طلبات بانتظار التسليم</div>
-            )}
-            {completedOrders.filter(o => o.status === 'ready' || o.status === 'out_for_delivery').map(order => (
-              <button
-                key={order.id}
-                onClick={() => setSelectedOrder(order)}
-                className={`w-full text-right p-3 rounded-xl border transition-all ${
-                  selectedOrder?.id === order.id ? 'bg-white/10 border-white/20' : 'bg-black/20 border-white/5 hover:bg-white/5'
-                }`}
-              >
-                <div className="flex justify-between items-center opacity-90">
-                  <span className="font-bold font-mono text-xs text-yellow-500/80">#{String(order.id).includes('-') ? String(order.id).split('-')[0].toUpperCase() : String(order.id).toUpperCase()}</span>
-                  <CheckCircle size={14} className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]" />
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+
 
         {/* Completed Orders Section (Delivered) */}
         <div className="flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 md:h-[20%] min-h-[120px] md:overflow-hidden">
@@ -202,10 +182,10 @@ export default function KitchenPage() {
             </h2>
           </div>
           <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-            {completedOrders.filter(o => o.status === 'delivered').length === 0 && (
+            {completedOrders.length === 0 && (
               <div className="text-center text-white/20 text-xs mt-4">لا توجد طلبات مسلمة بعد</div>
             )}
-            {completedOrders.filter(o => o.status === 'delivered').map(order => (
+            {completedOrders.map(order => (
               <button
                 key={order.id}
                 onClick={() => setSelectedOrder(order)}
@@ -325,41 +305,41 @@ export default function KitchenPage() {
 
             {/* Action Buttons based on status */}
             <div className="sticky bottom-0 z-50 shrink-0 pt-4 pb-4 border-t border-white/10 mt-2 bg-zinc-900 w-full shadow-[0_-10px_20px_rgba(24,24,27,0.8)]">
+              {/* 1. حالة الطلب الجديد */}
               {selectedOrder.status === 'pending' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'preparing')}
-                  className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                  className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3"
                 >
-                  <ChefHat size={28} />
-                  البدء بالتجهيز
+                  <ChefHat size={28} /> البدء بالتجهيز
                 </button>
               )}
               
+              {/* 2. حالة الطلب قيد التجهيز */}
               {selectedOrder.status === 'preparing' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'ready')}
-                  className="w-full bg-green-500 hover:bg-green-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                  className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3"
                 >
-                  <CheckCircle size={28} />
-                  الانتهاء من التجهيز ✔️
+                  <CheckCircle size={28} /> تم التجهيز (بانتظار الزبون)
                 </button>
               )}
 
-              {['out_for_delivery', 'delivered'].includes(selectedOrder.status) && (
-                <div className="w-full bg-black/40 text-white/40 font-bold text-lg py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 border border-white/5">
-                  <CheckCircle size={24} />
-                  دورة حياة الطلب منتهية (مكتمل)
-                </div>
-              )}
-              
+              {/* 3. حالة الطلب الجاهز - هنا يظهر زر التسليم */}
               {selectedOrder.status === 'ready' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'delivered')}
-                  className="w-full bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl shadow-[0_0_40px_rgba(59,130,246,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                  className="w-full bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(59,130,246,0.3)]"
                 >
-                  <Package size={28} />
-                  تم تسليم الطلب للعميل 🤝
+                  <Package size={28} /> تم تسليم الطلب للعميل 🤝
                 </button>
+              )}
+
+              {/* 4. حالة الطلب المسلم سابقاً */}
+              {['out_for_delivery', 'delivered'].includes(selectedOrder.status) && (
+                <div className="w-full bg-green-500/20 text-green-500 font-bold text-lg py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 border border-green-500/20">
+                  <CheckCircle size={24} /> تم تسليم هذا الطلب بنجاح
+                </div>
               )}
             </div>
           </div>
