@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import {
   Plus, Pencil, Trash2, Upload, Check, X, Loader2,
   ImagePlus, FileImage, LayoutDashboard, Package,
-  Layers, Image, Palette, ArrowLeft, ArrowRight, ChevronLeft, Lock
+  Layers, Image, Palette, ArrowLeft, ArrowRight, ChevronLeft, Lock, Settings
 } from 'lucide-react';
 
 const supabase = createClient(
@@ -20,7 +20,7 @@ interface Product {
 }
 interface Category { id: number; name: string; slug: string; }
 interface Sauce { id: number; name: string; description?: string; image_url: string; price: number; is_available: boolean; category_id?: number; product_type?: string; }
-type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'sauces' | 'sauce-effects' | 'brand-identity' | 'images';
+type Section = 'menu' | 'dashboard' | 'products' | 'categories' | 'sauces' | 'sauce-effects' | 'brand-identity' | 'images' | 'settings';
 
 // ── Server upload (bypasses RLS) ──────────────────────────────────────────────
 async function serverUpload(blob: Blob, path: string): Promise<string | null> {
@@ -688,6 +688,7 @@ export default function AdminClient({ initialProducts, initialCategories }: {
     { id: 'sauce-effects' as Section, label: 'تأثيرات الصوص', icon: <Image size={17}/> },
     { id: 'brand-identity' as Section, label: 'الهوية التجارية', icon: <Image size={17}/> }, /* Needs a better icon, maybe use Star or Crown, wait I'll just use a layout icon */
     { id: 'images'    as Section, label: 'إدارة الصور', icon: <Image size={17}/> },
+    { id: 'settings'  as Section, label: 'إعدادات المتجر', icon: <Settings size={17}/> },
   ];
 
   return (
