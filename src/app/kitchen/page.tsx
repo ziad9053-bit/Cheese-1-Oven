@@ -338,8 +338,9 @@ export default function KitchenPage() {
             </div>
 
             {/* Action Buttons based on status */}
-            <div className="sticky bottom-0 z-50 shrink-0 pt-4 pb-4 border-t border-white/10 mt-2 bg-zinc-900 w-full shadow-[0_-10px_20px_rgba(24,24,27,0.8)]">
-              {/* 1. حالة الطلب الجديد */}
+            <div className="sticky bottom-0 z-50 shrink-0 pt-4 pb-4 border-t border-white/10 mt-2 bg-zinc-900 w-full">
+              
+              {/* 1. حالة البدء بالتجهيز */}
               {selectedOrder.status === 'pending' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'preparing')}
@@ -349,7 +350,7 @@ export default function KitchenPage() {
                 </button>
               )}
               
-              {/* 2. حالة الطلب قيد التجهيز */}
+              {/* 2. حالة الانتهاء من التجهيز - تفرقة بين النوعين */}
               {selectedOrder.status === 'preparing' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'ready')}
@@ -360,29 +361,30 @@ export default function KitchenPage() {
                 </button>
               )}
 
-              {/* 3. حالة الطلب الجاهز - هنا يظهر زر التسليم */}
+              {/* 3. حالة الطلب الجاهز - تسليم للزبون مباشرة */}
               {selectedOrder.status === 'ready' && selectedOrder.order_type === 'pickup' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'delivered')}
-                  className="w-full bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(59,130,246,0.3)]"
+                  className="w-full bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3"
                 >
-                  <Package size={28} /> تم تسليم الطلب للعميل 🤝
+                  <Package size={28} /> تم تسليم الطلب للزبون 🤝
                 </button>
               )}
 
+              {/* 4. حالة الطلب الجاهز - تسليم للسائق */}
               {selectedOrder.status === 'ready' && selectedOrder.order_type === 'delivery' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'out_for_delivery')}
-                  className="w-full bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(59,130,246,0.3)]"
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3"
                 >
-                  <Package size={28} /> تم تسليم الطلب للسائق 🛵
+                  <Truck size={28} /> تم تسليم الطلب للسائق 🛵
                 </button>
               )}
 
-              {/* 4. حالة الطلب المسلم سابقاً */}
+              {/* 5. حالة الطلب المسلم سابقاً */}
               {['out_for_delivery', 'delivered'].includes(selectedOrder.status) && (
                 <div className="w-full bg-green-500/20 text-green-500 font-bold text-lg py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 border border-green-500/20">
-                  <CheckCircle size={24} /> تم تسليم هذا الطلب بنجاح
+                  <CheckCircle size={24} /> الطلب خرج من المطبخ بنجاح
                 </div>
               )}
             </div>
