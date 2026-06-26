@@ -209,23 +209,9 @@ export default function KitchenPage() {
         {selectedOrder ? (
           <div className="flex-1 flex flex-col h-full">
             <div className="flex flex-col md:flex-row justify-between items-start mb-6 pb-6 border-b border-white/10 gap-4 shrink-0">
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                <div className="bg-white p-2 rounded-xl shrink-0">
-                  <QRCode
-                    value={`رقم الطلب: ${String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
-العميل: ${selectedOrder.customer_name}
-الوقت: ${new Date(selectedOrder.created_at).toLocaleTimeString('ar-SA')}
-الإجمالي: ${selectedOrder.total_price ? selectedOrder.total_price + ' ريال' : 'غير محدد'}
--------------------
-الأصناف:
-${selectedOrder.items?.map((i: any) => `${i.name} (x${i.quantity})`).join('\n')}
-${selectedOrder.notes ? '\nملاحظات: ' + selectedOrder.notes : ''}`}
-                    size={80}
-                  />
-                </div>
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-black mb-2 flex flex-wrap items-center gap-2 md:gap-3">
-                    طلب #{String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black mb-2 flex flex-wrap items-center gap-2 md:gap-3">
+                  طلب #{String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
                   <span className={`text-xs px-3 py-1 rounded-full border hidden md:inline-block ${
                     selectedOrder.order_type === 'pickup' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                   }`}>

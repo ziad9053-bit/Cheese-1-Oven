@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { motion } from 'framer-motion';
 import { ChefHat, CheckCircle, Package, ArrowRight, X } from 'lucide-react';
+import QRCode from "react-qr-code";
 
 interface OrderTrackingScreenProps {
   orderId: string;
@@ -13,13 +14,15 @@ interface OrderTrackingScreenProps {
 export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenProps) {
   const [status, setStatus] = useState<string>('pending');
   const [orderType, setOrderType] = useState<string>('pickup');
+  const [orderDetails, setOrderDetails] = useState<any>(null);
 
   useEffect(() => {
     const fetchStatus = async () => {
-      const { data, error } = await supabase.from('orders').select('status, order_type').eq('id', orderId).single();
+      const { data, error } = await supabase.from('orders').select('*').eq('id', orderId).single();
       if (data) {
         setStatus(data.status);
         setOrderType(data.order_type);
+        setOrderDetails(data);
       }
     };
     
@@ -28,6 +31,7 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
     const sub = supabase.channel(`order_tracking_${orderId}`)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` }, (payload) => {
         setStatus(payload.new.status);
+        setOrderDetails(payload.new);
       })
       .subscribe();
 
@@ -35,6 +39,17 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
       supabase.removeChannel(sub);
     };
   }, [orderId]);
+
+  const qrValue = orderDetails ? `رقم الطلب: ${String(orderDetails.id).includes('-') ? String(orderDetails.id).split('-')[0].toUpperCase() : String(orderDetails.id).toUpperCase()}
+العميل: ${orderDetails.customer_name}
+الوقت: ${new Date(orderDetails.created_at).toLocaleTimeString('ar-SA')}
+الإجمالي: ${orderDetails.total_price ? orderDetails.total_price + ' ريال' : 'غير محدد'}
+-------------------
+الأصناف:
+${orderDetails.items?.map((i: any) => `${i.name} (x${i.quantity})`).join('\n')}` : orderId;
+
+  // Determine QR Color: Tomato (#ff6347 / Tailwind red-400 equivalent) for pending/preparing. Green (#22c55e) for ready/delivered.
+  const qrColor = (status === 'ready' || status === 'delivered') ? '#22c55e' : '#f87171';
 
   return (
     <div className="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center p-6" dir="rtl">
@@ -48,7 +63,7 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-zinc-900 border border-white/10 rounded-3xl p-8 max-w-sm w-full text-center space-y-8"
+        className="bg-zinc-900 border border-white/10 rounded-3xl p-8 max-w-sm w-full text-center space-y-8 overflow-y-auto max-h-[90vh] custom-scrollbar"
       >
         <div className="space-y-4">
           <p className="text-white/50 text-sm font-bold tracking-widest">حالة الطلب</p>
@@ -103,9 +118,18 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
           </p>
         </div>
 
-        <div className="bg-black/40 rounded-2xl p-4 border border-white/5">
-          <p className="text-white/40 text-xs mb-1">رقم الطلب</p>
-          <p className="text-white font-mono font-bold">{String(orderId).includes('-') ? String(orderId).split('-')[0].toUpperCase() : String(orderId).toUpperCase()}</p>
+        <div className="bg-black/40 rounded-2xl p-6 border border-white/5 flex flex-col items-center justify-center">
+          <p className="text-white/50 text-xs mb-4 font-bold">باركود الطلب</p>
+          <div className="bg-white p-3 rounded-2xl inline-block shadow-xl">
+            <QRCode 
+              value={qrValue} 
+              size={140} 
+              fgColor={qrColor}
+            />
+          </div>
+          <p className="text-white/40 font-mono font-bold mt-4 text-xs tracking-widest">
+            #{String(orderId).includes('-') ? String(orderId).split('-')[0].toUpperCase() : String(orderId).toUpperCase()}
+          </p>
         </div>
       </motion.div>
     </div>
