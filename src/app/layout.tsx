@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${fontPacifico.variable} ${fontLobster.variable} ${fontRighteous.variable} ${fontBebas.variable} ${fontChewy.variable} antialiased bg-black text-white font-sans overflow-hidden select-none touch-none`}
+        className={`${geistSans.variable} ${geistMono.variable} ${fontPacifico.variable} ${fontLobster.variable} ${fontRighteous.variable} ${fontBebas.variable} ${fontChewy.variable} antialiased bg-black text-white font-sans select-none`}
       >
         {children}
       </body>
