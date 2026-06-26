@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Home, Package, MapPin, Phone, CheckCircle, Navigation, Truck } from 'lucide-react';
+import { Home, Package, MapPin, Phone, CheckCircle, Navigation, Truck, Lock, ChefHat } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playPopSound } from '@/lib/sounds';
@@ -168,27 +168,34 @@ export default function DriverPage() {
                 <h2 className="text-2xl font-black mb-4 flex items-center gap-3">
                   طلب #{String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
                 </h2>
-                <div className="bg-black/40 p-4 rounded-2xl border border-white/5 space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center shrink-0">
-                      <Phone size={14} className="text-white/70" />
+                {selectedOrder.status === 'out_for_delivery' ? (
+                  <div className="bg-black/40 p-4 rounded-2xl border border-white/5 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center shrink-0">
+                        <Phone size={14} className="text-white/70" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-white/50">اسم العميل ورقم الجوال</p>
+                        <p className="font-bold text-lg">{selectedOrder.customer_name} - <a href={`tel:${selectedOrder.customer_phone}`} className="text-blue-400 hover:underline" onClick={e => e.stopPropagation()}>{selectedOrder.customer_phone}</a></p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-white/50">اسم العميل ورقم الجوال</p>
-                      <p className="font-bold text-lg">{selectedOrder.customer_name} - <a href={`tel:${selectedOrder.customer_phone}`} className="text-blue-400 hover:underline" onClick={e => e.stopPropagation()}>{selectedOrder.customer_phone}</a></p>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center shrink-0">
+                        <MapPin size={14} className="text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-blue-400/50">عنوان التوصيل</p>
+                        <p className="font-bold text-lg">{selectedOrder.customer_address}</p>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center shrink-0">
-                      <MapPin size={14} className="text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-blue-400/50">عنوان التوصيل</p>
-                      <p className="font-bold text-lg">{selectedOrder.customer_address}</p>
-                    </div>
+                ) : (
+                  <div className="bg-orange-500/10 border border-orange-500/20 text-orange-400 p-4 rounded-2xl text-sm font-bold flex items-center gap-2">
+                    <Lock size={16} /> 
+                    تفاصيل العميل ستظهر بعد أن يسلمك المطبخ هذا الطلب
                   </div>
-                </div>
+                )}
               </div>
               
               <div className="text-center bg-black/40 px-6 py-3 rounded-2xl border border-white/5">
@@ -220,7 +227,7 @@ export default function DriverPage() {
                       <p className="text-sm whitespace-pre-wrap">{selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').trim()}</p>
                     </div>
                   )}
-                  {selectedOrder.notes.includes('[DOOR_IMAGE]') && (
+                  {selectedOrder.status === 'out_for_delivery' && selectedOrder.notes.includes('[DOOR_IMAGE]') && (
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                       <h4 className="font-bold text-sm mb-3 flex items-center gap-2 text-white/80">
                         <Package size={16} /> صورة باب المنزل
@@ -240,14 +247,11 @@ export default function DriverPage() {
 
             <div className="flex gap-4">
               {selectedOrder.status === 'ready' ? (
-                <button 
-                  onClick={() => updateStatus(selectedOrder.id, 'out_for_delivery')}
-                  className="flex-1 bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-6 rounded-2xl shadow-[0_0_40px_rgba(59,130,246,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-                >
-                  <Truck size={28} />
-                  استلام والبدء بالتوصيل 🚀
-                </button>
-              ) : (
+                <div className="flex-1 bg-zinc-800/50 text-white/50 font-bold text-lg py-6 rounded-2xl flex items-center justify-center gap-3 border border-white/5">
+                  <ChefHat size={24} />
+                  بانتظار تسليم المطبخ للطلب
+                </div>
+              ) : selectedOrder.status === 'out_for_delivery' ? (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'delivered')}
                   className="flex-1 bg-green-500 hover:bg-green-400 text-black font-black text-xl py-6 rounded-2xl shadow-[0_0_40px_rgba(34,197,94,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
@@ -255,7 +259,7 @@ export default function DriverPage() {
                   <CheckCircle size={28} />
                   تم تسليم الطلب للعميل ✔️
                 </button>
-              )}
+              ) : null}
             </div>
           </div>
         ) : (

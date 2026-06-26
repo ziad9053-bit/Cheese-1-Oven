@@ -85,11 +85,11 @@ export default function KitchenPage() {
     if (selectedOrder && selectedOrder.id === id) {
       setSelectedOrder({ ...selectedOrder, status: newStatus });
       
-      if (newStatus === 'delivered') {
+      if (newStatus === 'delivered' || newStatus === 'out_for_delivery') {
         setTimeout(() => setSelectedOrder(null), 800);
         
-        // Check if there is a door image to delete
-        if (selectedOrder.notes?.includes('[DOOR_PATH]')) {
+        // Check if there is a door image to delete (only if actually delivered to customer)
+        if (newStatus === 'delivered' && selectedOrder.notes?.includes('[DOOR_PATH]')) {
           const match = selectedOrder.notes.match(/\[DOOR_PATH\](.*?)\[\/DOOR_PATH\]/);
           if (match && match[1]) {
             fetch('/api/delete-image', {
@@ -279,11 +279,12 @@ export default function KitchenPage() {
                   </span>
                 </div>
 
-                <div className="text-white/60 text-sm space-y-1 mt-2 md:mt-4 bg-black/40 p-4 rounded-xl border border-white/5 inline-block w-full md:min-w-[250px]">
-                  <p>العميل: <strong className="text-white">{selectedOrder.customer_name}</strong></p>
-                  <p>الجوال: <a href={`tel:${selectedOrder.customer_phone}`} className="text-blue-400 hover:underline">{selectedOrder.customer_phone}</a></p>
-                  {selectedOrder.order_type === 'delivery' && <p>العنوان: {selectedOrder.customer_address}</p>}
-                </div>
+                {selectedOrder.order_type === 'pickup' && (
+                  <div className="text-white/60 text-sm space-y-1 mt-2 md:mt-4 bg-black/40 p-4 rounded-xl border border-white/5 inline-block w-full md:min-w-[250px]">
+                    <p>العميل: <strong className="text-white">{selectedOrder.customer_name}</strong></p>
+                    <p>الجوال: <a href={`tel:${selectedOrder.customer_phone}`} className="text-blue-400 hover:underline">{selectedOrder.customer_phone}</a></p>
+                  </div>
+                )}
               </div>
               
               <div className="text-center bg-black/40 px-6 py-3 rounded-2xl border border-white/5 w-full md:w-auto shrink-0">
@@ -354,17 +355,27 @@ export default function KitchenPage() {
                   onClick={() => updateStatus(selectedOrder.id, 'ready')}
                   className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3"
                 >
-                  <CheckCircle size={28} /> تم التجهيز (بانتظار الزبون)
+                  <CheckCircle size={28} /> 
+                  {selectedOrder.order_type === 'pickup' ? 'تم التجهيز (بانتظار الزبون)' : 'تم التجهيز (بانتظار السائق)'}
                 </button>
               )}
 
               {/* 3. حالة الطلب الجاهز - هنا يظهر زر التسليم */}
-              {selectedOrder.status === 'ready' && (
+              {selectedOrder.status === 'ready' && selectedOrder.order_type === 'pickup' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'delivered')}
                   className="w-full bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(59,130,246,0.3)]"
                 >
                   <Package size={28} /> تم تسليم الطلب للعميل 🤝
+                </button>
+              )}
+
+              {selectedOrder.status === 'ready' && selectedOrder.order_type === 'delivery' && (
+                <button 
+                  onClick={() => updateStatus(selectedOrder.id, 'out_for_delivery')}
+                  className="w-full bg-blue-500 hover:bg-blue-400 text-black font-black text-xl py-4 md:py-6 rounded-2xl flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(59,130,246,0.3)]"
+                >
+                  <Package size={28} /> تم تسليم الطلب للسائق 🛵
                 </button>
               )}
 

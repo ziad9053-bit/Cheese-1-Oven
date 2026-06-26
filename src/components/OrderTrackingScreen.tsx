@@ -212,6 +212,39 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
           )}
         </motion.div>
 
+          {status === 'out_for_delivery' && (
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4, type: 'spring' }}
+              className="mt-5 w-full relative z-10"
+            >
+              <button 
+                onClick={async () => {
+                  try {
+                    await supabase.from('orders').update({ status: 'delivered' }).eq('id', orderId);
+                    
+                    if (orderDetails?.notes?.includes('[DOOR_PATH]')) {
+                      const match = orderDetails.notes.match(/\[DOOR_PATH\](.*?)\[\/DOOR_PATH\]/);
+                      if (match && match[1]) {
+                        fetch('/api/delete-image', {
+                          method: 'POST',
+                          body: JSON.stringify({ path: match[1] }),
+                        }).catch(console.error);
+                      }
+                    }
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }}
+                className="w-full bg-green-500 hover:bg-green-400 text-black font-black text-xl py-4 rounded-2xl flex justify-center items-center gap-3 shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all active:scale-95"
+              >
+                <CheckCircle2 size={24} />
+                استلمت طلبي بنجاح
+              </button>
+            </motion.div>
+          )}
+
       </div>
     </div>
   );
