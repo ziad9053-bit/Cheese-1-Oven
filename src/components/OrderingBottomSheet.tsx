@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronUp, Trash2, ShoppingBag, Plus, Minus, CreditCard, Sparkles, ArrowRight } from 'lucide-react';
+import { ChevronUp, Trash2, ShoppingBag, Plus, Minus, CreditCard, Sparkles, ArrowRight, MapPin } from 'lucide-react';
 import { Product, Sauce, Drink } from '@/lib/data';
 
 interface CartItem {
@@ -291,13 +291,38 @@ export const OrderingBottomSheet: React.FC<Props> = ({
 
                       {orderType === 'delivery' && (
                         <div className="space-y-2">
-                          <label className="text-white/70 text-sm font-bold">العنوان (إجباري للتوصيل)</label>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="text-white/70 text-sm font-bold">العنوان (إجباري للتوصيل)</label>
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                if ('geolocation' in navigator) {
+                                  navigator.geolocation.getCurrentPosition(
+                                    (position) => {
+                                      const { latitude, longitude } = position.coords;
+                                      const mapLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                                      setCustomerAddress(mapLink);
+                                    },
+                                    (error) => {
+                                      alert("حدث خطأ أثناء جلب الموقع، يرجى تفعيل إعدادات الموقع والمحاولة مرة أخرى.");
+                                    }
+                                  );
+                                } else {
+                                  alert("الموقع غير مدعوم في متصفحك.");
+                                }
+                              }}
+                              className="text-[10px] bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 px-3 py-1.5 rounded-full font-bold transition-all flex items-center gap-1"
+                            >
+                              <MapPin size={12} />
+                              استخدام موقعي الحالي
+                            </button>
+                          </div>
                           <input 
                             type="text" 
                             value={customerAddress}
                             onChange={e => setCustomerAddress(e.target.value)}
-                            placeholder="اسم الحي، الشارع، رقم المبنى..." 
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary text-right"
+                            placeholder="اسم الحي، الشارع، أو سيتم وضع رابط الموقع هنا..." 
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary text-right text-sm"
                           />
                         </div>
                       )}
