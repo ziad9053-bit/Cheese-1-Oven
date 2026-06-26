@@ -79,13 +79,14 @@ export default function KitchenPage() {
   }, [orders, completedOrders]);
 
   const updateStatus = async (id: string, newStatus: string) => {
+    // Optimistic UI update so the button changes instantly!
+    if (selectedOrder && selectedOrder.id === id) {
+      setSelectedOrder({ ...selectedOrder, status: newStatus });
+    }
+
     const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
     if (!error) {
       fetchOrders();
-      if (newStatus === 'ready' || newStatus === 'delivered') {
-        // We keep it selected so the user can immediately click "Deliver" if needed,
-        // or see that it's done. Mobile users can click back manually.
-      }
     } else {
       alert('حدث خطأ أثناء تحديث حالة الطلب');
     }
@@ -253,11 +254,13 @@ export default function KitchenPage() {
                   <span className={`text-xs px-3 py-1 rounded-full border hidden md:inline-block ${
                     selectedOrder.status === 'pending' ? 'bg-red-500/10 text-red-400 border-red-500/20' 
                     : selectedOrder.status === 'preparing' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20'
+                    : selectedOrder.status === 'ready' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
                     : 'bg-green-500/10 text-green-400 border-green-500/20'
                   }`}>
                     {selectedOrder.status === 'pending' ? 'بانتظار البدء' 
                     : selectedOrder.status === 'preparing' ? 'قيد التجهيز الآن'
-                    : 'منجز ✔️'}
+                    : selectedOrder.status === 'ready' ? 'بانتظار التسليم 📦'
+                    : 'مكتمل ومسلم ✔️'}
                   </span>
                 </h2>
                 
@@ -271,11 +274,13 @@ export default function KitchenPage() {
                   <span className={`text-xs px-3 py-1 rounded-full border ${
                     selectedOrder.status === 'pending' ? 'bg-red-500/10 text-red-400 border-red-500/20' 
                     : selectedOrder.status === 'preparing' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20'
+                    : selectedOrder.status === 'ready' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
                     : 'bg-green-500/10 text-green-400 border-green-500/20'
                   }`}>
                     {selectedOrder.status === 'pending' ? 'بانتظار البدء' 
                     : selectedOrder.status === 'preparing' ? 'قيد التجهيز الآن'
-                    : 'منجز ✔️'}
+                    : selectedOrder.status === 'ready' ? 'بانتظار التسليم 📦'
+                    : 'مكتمل ومسلم ✔️'}
                   </span>
                 </div>
 
