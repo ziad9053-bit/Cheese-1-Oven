@@ -82,8 +82,9 @@ export default function KitchenPage() {
     const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
     if (!error) {
       fetchOrders();
-      if (newStatus === 'ready') {
-        setSelectedOrder(null); // Return to list on mobile when done
+      if (newStatus === 'ready' || newStatus === 'delivered') {
+        // We keep it selected so the user can immediately click "Deliver" if needed,
+        // or see that it's done. Mobile users can click back manually.
       }
     } else {
       alert('حدث خطأ أثناء تحديث حالة الطلب');
@@ -164,16 +165,18 @@ export default function KitchenPage() {
           </div>
         </div>
 
-        {/* Completed Orders Section */}
-        <div className="flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 md:h-[30%] min-h-[200px] md:overflow-hidden">
+        {/* Ready Orders Section (Waiting for Delivery) */}
+        <div className="flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 md:h-[25%] min-h-[150px] md:overflow-hidden">
           <div className="mb-4 pb-2 border-b border-white/10">
-            <h2 className="text-white/50 text-sm font-bold">الطلبات المنجزة (للمراجعة)</h2>
+            <h2 className="text-yellow-500/90 text-sm font-bold flex items-center gap-2">
+              <Package size={14} /> بانتظار تسليم العميل
+            </h2>
           </div>
           <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-            {completedOrders.length === 0 && (
-              <div className="text-center text-white/20 text-xs mt-4">لا توجد طلبات منجزة بعد</div>
+            {completedOrders.filter(o => o.status === 'ready' || o.status === 'out_for_delivery').length === 0 && (
+              <div className="text-center text-white/20 text-xs mt-4">لا توجد طلبات بانتظار التسليم</div>
             )}
-            {completedOrders.map(order => (
+            {completedOrders.filter(o => o.status === 'ready' || o.status === 'out_for_delivery').map(order => (
               <button
                 key={order.id}
                 onClick={() => setSelectedOrder(order)}
@@ -181,15 +184,37 @@ export default function KitchenPage() {
                   selectedOrder?.id === order.id ? 'bg-white/10 border-white/20' : 'bg-black/20 border-white/5 hover:bg-white/5'
                 }`}
               >
-                <div className="flex justify-between items-center opacity-80">
+                <div className="flex justify-between items-center opacity-90">
+                  <span className="font-bold font-mono text-xs text-yellow-500/80">#{String(order.id).includes('-') ? String(order.id).split('-')[0].toUpperCase() : String(order.id).toUpperCase()}</span>
+                  <CheckCircle size={14} className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Completed Orders Section (Delivered) */}
+        <div className="flex flex-col bg-zinc-900 border border-white/10 rounded-3xl p-4 md:h-[20%] min-h-[120px] md:overflow-hidden">
+          <div className="mb-4 pb-2 border-b border-white/10">
+            <h2 className="text-green-500/70 text-sm font-bold flex items-center gap-2">
+              <CheckCircle size={14} /> طلبات مكتملة ومسلمة
+            </h2>
+          </div>
+          <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+            {completedOrders.filter(o => o.status === 'delivered').length === 0 && (
+              <div className="text-center text-white/20 text-xs mt-4">لا توجد طلبات مسلمة بعد</div>
+            )}
+            {completedOrders.filter(o => o.status === 'delivered').map(order => (
+              <button
+                key={order.id}
+                onClick={() => setSelectedOrder(order)}
+                className={`w-full text-right p-3 rounded-xl border transition-all ${
+                  selectedOrder?.id === order.id ? 'bg-white/10 border-white/20' : 'bg-black/20 border-white/5 hover:bg-white/5'
+                }`}
+              >
+                <div className="flex justify-between items-center opacity-60">
                   <span className="font-bold font-mono text-xs">#{String(order.id).includes('-') ? String(order.id).split('-')[0].toUpperCase() : String(order.id).toUpperCase()}</span>
-                  {order.status === 'delivered' ? (
-                    <CheckCircle size={14} className="text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
-                  ) : order.status === 'ready' ? (
-                    <CheckCircle size={14} className="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.4)]" />
-                  ) : (
-                    <CheckCircle size={14} className="text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.4)]" />
-                  )}
+                  <CheckCircle size={14} className="text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
                 </div>
               </button>
             ))}
