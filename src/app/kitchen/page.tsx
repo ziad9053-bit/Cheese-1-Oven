@@ -192,7 +192,7 @@ export default function KitchenPage() {
       </div>
 
       {/* Main Area / Details - Hidden on mobile if NO order is selected */}
-      <div className={`w-full md:flex-1 bg-zinc-900 border border-white/10 rounded-3xl p-4 md:p-6 flex-col relative h-[calc(100dvh-2rem)] md:h-auto md:min-h-[600px] md:overflow-hidden ${!selectedOrder ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`w-full md:flex-1 bg-zinc-900 border border-white/10 rounded-3xl p-4 md:p-6 flex-col relative ${!selectedOrder ? 'hidden md:flex' : 'flex'}`}>
         
         {/* Mobile Back Button */}
         {selectedOrder && (
@@ -206,8 +206,8 @@ export default function KitchenPage() {
         )}
 
         {selectedOrder ? (
-          <div className="flex-1 flex flex-col h-full overflow-hidden">
-            <div className="flex flex-col md:flex-row justify-between items-start mb-6 pb-6 border-b border-white/10 gap-4 shrink-0 overflow-y-auto max-h-[40vh] custom-scrollbar">
+          <div className="flex-1 flex flex-col h-full">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-6 pb-6 border-b border-white/10 gap-4 shrink-0">
               <div>
                 <h2 className="text-2xl md:text-3xl font-black mb-2 flex flex-wrap items-center gap-2 md:gap-3">
                   طلب #{String(selectedOrder.id).includes('-') ? String(selectedOrder.id).split('-')[0].toUpperCase() : String(selectedOrder.id).toUpperCase()}
@@ -260,7 +260,7 @@ export default function KitchenPage() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto mb-4 pr-2 custom-scrollbar">
+            <div className="flex-1 mb-4">
               <h3 className="text-lg font-bold text-white/80 mb-4">الأصناف المطلوبة</h3>
               <div className="space-y-3">
                 {selectedOrder.items?.map((item: any, idx: number) => (
@@ -287,7 +287,7 @@ export default function KitchenPage() {
             </div>
 
             {/* Action Buttons based on status */}
-            <div className="shrink-0 pt-4 pb-2 border-t border-white/10 mt-2 bg-zinc-900">
+            <div className="sticky bottom-0 z-50 shrink-0 pt-4 pb-4 border-t border-white/10 mt-2 bg-zinc-900 w-full shadow-[0_-10px_20px_rgba(24,24,27,0.8)]">
               {selectedOrder.status === 'pending' && (
                 <button 
                   onClick={() => updateStatus(selectedOrder.id, 'preparing')}
