@@ -38,7 +38,13 @@ export default function DriverPage() {
           if (['pending', 'preparing', 'ready', 'out_for_delivery'].includes(payload.new.status)) {
             setOrders(prev => {
               const exists = prev.find(o => o.id === payload.new.id);
-              if (!exists && payload.new.status === 'ready') playPopSound();
+              
+              if (!exists && payload.eventType === 'INSERT') {
+                playPopSound(); // New order arrived
+              } else if (exists && exists.status !== 'ready' && payload.new.status === 'ready') {
+                playPopSound(); // Preparation finished
+              }
+
               return exists 
                 ? prev.map(o => o.id === payload.new.id ? payload.new : o)
                 : [...prev, payload.new];
