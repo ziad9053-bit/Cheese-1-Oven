@@ -384,7 +384,7 @@ export default function ClientPage({ products, sauces, drinks }: Props) {
               customer_phone: data.customerPhone,
               customer_address: data.customerAddress || null,
               order_type: data.orderType,
-              notes: data.notes || null,
+              notes: (data.notes || '') + (data.paymentMethod ? `\n\n[PAYMENT_METHOD]${data.paymentMethod}[/PAYMENT_METHOD]` : ''),
               items: mappedItems,
               total_price,
               status: 'pending'

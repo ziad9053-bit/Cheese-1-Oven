@@ -152,6 +152,12 @@ export default function InvoicePage() {
                   <span className="meta-label">النوع:</span>
                   <span className="meta-value">{order.order_type === 'pickup' ? 'استلام من الفرع' : 'توصيل'}</span>
               </div>
+              {order.notes && order.notes.includes('[PAYMENT_METHOD]') && (
+                <div className="meta-row">
+                    <span className="meta-label">طريقة الدفع:</span>
+                    <span className="meta-value">{order.notes.match(/\[PAYMENT_METHOD\](.*?)\[\/PAYMENT_METHOD\]/)?.[1] === 'cash' ? '💵 كاش' : '💳 صرافة / بطاقة'}</span>
+                </div>
+              )}
           </div>
 
           <div className="items-list">

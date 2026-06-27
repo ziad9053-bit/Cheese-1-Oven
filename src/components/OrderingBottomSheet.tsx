@@ -24,6 +24,7 @@ export interface CheckoutData {
   customerPhone: string;
   customerAddress: string;
   notes: string;
+  paymentMethod: 'cash' | 'card';
 }
 
 interface Props {
@@ -64,6 +65,7 @@ export const OrderingBottomSheet: React.FC<Props> = ({
   const [doorImage, setDoorImage] = useState<{ url: string, path: string } | null>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [notes, setNotes] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card'>('cash');
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -398,6 +400,28 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                         </div>
                       )}
 
+                      <div className="space-y-3">
+                        <label className="text-white/70 text-sm font-bold">طريقة الدفع</label>
+                        <div className="flex gap-3">
+                          <button 
+                            onClick={() => setPaymentMethod('cash')}
+                            className={`flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 transition-all ${
+                              paymentMethod === 'cash' ? 'bg-green-500/20 border-green-500 text-green-400 font-bold' : 'bg-black/40 border-white/5 text-white/50 hover:bg-white/5'
+                            }`}
+                          >
+                            💵 كاش
+                          </button>
+                          <button 
+                            onClick={() => setPaymentMethod('card')}
+                            className={`flex-1 py-3 rounded-xl border flex items-center justify-center gap-2 transition-all ${
+                              paymentMethod === 'card' ? 'bg-blue-500/20 border-blue-500 text-blue-400 font-bold' : 'bg-black/40 border-white/5 text-white/50 hover:bg-white/5'
+                            }`}
+                          >
+                            💳 صرافة / بطاقة
+                          </button>
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <label className="text-white/70 text-sm font-bold">ملاحظات (اختياري)</label>
                         <textarea 
@@ -446,7 +470,8 @@ export const OrderingBottomSheet: React.FC<Props> = ({
                   customerName,
                   customerPhone,
                   customerAddress,
-                  notes: finalNotes
+                  notes: finalNotes,
+                  paymentMethod
                 });
               }
             }}

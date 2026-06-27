@@ -227,9 +227,23 @@ export default function DriverPage() {
                 )}
               </div>
               
-              <div className="text-center bg-black/40 px-6 py-3 rounded-2xl border border-white/5">
-                <p className="text-white/40 text-xs mb-1">المبلغ المطلوب</p>
-                <p className="font-black text-2xl text-green-400">{selectedOrder.total_price} <span className="text-sm">ر.س</span></p>
+              <div className="text-center bg-black/40 px-6 py-3 rounded-2xl border border-white/5 flex justify-between items-center w-full">
+                <div>
+                  <p className="text-white/40 text-xs mb-1 text-right">المبلغ المطلوب</p>
+                  <p className="font-black text-3xl text-emerald-400">{selectedOrder.total_price} <span className="text-sm">ر.س</span></p>
+                </div>
+                {selectedOrder.notes && selectedOrder.notes.includes('[PAYMENT_METHOD]') && (
+                  <div className={`px-4 py-2 rounded-xl border ${
+                    selectedOrder.notes.match(/\[PAYMENT_METHOD\](.*?)\[\/PAYMENT_METHOD\]/)?.[1] === 'cash' 
+                      ? 'bg-green-500/10 border-green-500/20 text-green-400' 
+                      : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                  }`}>
+                    <p className="text-xs opacity-70 mb-0.5">طريقة الدفع</p>
+                    <p className="font-bold text-sm">
+                      {selectedOrder.notes.match(/\[PAYMENT_METHOD\](.*?)\[\/PAYMENT_METHOD\]/)?.[1] === 'cash' ? '💵 كاش' : '💳 صرافة'}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -250,10 +264,10 @@ export default function DriverPage() {
 
               {selectedOrder.notes && (
                 <div className="mt-6 space-y-4">
-                  {selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').trim() && (
+                  {selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').replace(/\[PAYMENT_METHOD\].*?\[\/PAYMENT_METHOD\]/g, '').trim() && (
                     <div className="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-4 text-orange-400">
                       <h4 className="font-bold text-sm mb-1">ملاحظات العميل:</h4>
-                      <p className="text-sm whitespace-pre-wrap">{selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').trim()}</p>
+                      <p className="text-sm whitespace-pre-wrap">{selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').replace(/\[PAYMENT_METHOD\].*?\[\/PAYMENT_METHOD\]/g, '').trim()}</p>
                     </div>
                   )}
                   {selectedOrder.status === 'out_for_delivery' && selectedOrder.notes.includes('[DOOR_IMAGE]') && (

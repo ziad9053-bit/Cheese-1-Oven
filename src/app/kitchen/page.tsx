@@ -245,6 +245,17 @@ export default function KitchenPage() {
                     {selectedOrder.order_type === 'pickup' ? 'استلام من المحل' : 'توصيل للسائق'}
                   </span>
                   
+                  {/* Payment Method Badge */}
+                  {selectedOrder.notes && selectedOrder.notes.includes('[PAYMENT_METHOD]') && (
+                    <span className={`text-xs px-3 py-1 rounded-full border hidden md:inline-block ${
+                      selectedOrder.notes.match(/\[PAYMENT_METHOD\](.*?)\[\/PAYMENT_METHOD\]/)?.[1] === 'cash' 
+                        ? 'bg-green-500/10 text-green-400 border-green-500/20' 
+                        : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                    }`}>
+                      {selectedOrder.notes.match(/\[PAYMENT_METHOD\](.*?)\[\/PAYMENT_METHOD\]/)?.[1] === 'cash' ? '💵 دفع كاش' : '💳 صرافة'}
+                    </span>
+                  )}
+                  
                   {/* Status Badge */}
                   <span className={`text-xs px-3 py-1 rounded-full border hidden md:inline-block ${
                     selectedOrder.status === 'pending' ? 'bg-red-500/10 text-red-400 border-red-500/20' 
@@ -313,10 +324,10 @@ export default function KitchenPage() {
 
               {selectedOrder.notes && (
                 <div className="mt-6 space-y-4">
-                  {selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').trim() && (
+                  {selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').replace(/\[PAYMENT_METHOD\].*?\[\/PAYMENT_METHOD\]/g, '').trim() && (
                     <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-400">
                       <h4 className="font-bold text-sm mb-1">ملاحظات العميل (هام):</h4>
-                      <p className="text-sm whitespace-pre-wrap">{selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').trim()}</p>
+                      <p className="text-sm whitespace-pre-wrap">{selectedOrder.notes.replace(/\[DOOR_IMAGE\].*?\[\/DOOR_IMAGE\]/g, '').replace(/\[DOOR_PATH\].*?\[\/DOOR_PATH\]/g, '').replace(/\[PAYMENT_METHOD\].*?\[\/PAYMENT_METHOD\]/g, '').trim()}</p>
                     </div>
                   )}
                 </div>
