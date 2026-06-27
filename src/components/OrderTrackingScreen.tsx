@@ -151,12 +151,12 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
           </div>
         </div>
 
-        {/* QR Code Glassmorphism Card */}
+        {/* QR Code Card */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white/[0.02] backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] rounded-3xl p-5 text-center relative overflow-hidden"
+          className="bg-black/60 backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-3xl p-5 text-center relative overflow-hidden"
         >
           {/* Subtle glow effect behind QR */}
           <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 ${status === 'ready' ? 'bg-blue-500/10' : status === 'delivered' ? 'bg-emerald-500/10' : 'bg-red-500/10'} blur-3xl rounded-full pointer-events-none transition-colors duration-700`} />
@@ -174,7 +174,7 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
           <div className="bg-white p-3 rounded-2xl inline-block shadow-2xl relative group z-10 transition-transform duration-300 hover:scale-105">
             <QRCode 
               value={qrValue} 
-              size={130} 
+              size={140} 
               fgColor={
                 status === 'delivered' ? '#10b981' : 
                 status === 'ready' ? '#3b82f6' : 
@@ -183,9 +183,11 @@ export function OrderTrackingScreen({ orderId, onClose }: OrderTrackingScreenPro
             />
           </div>
           
-          <p className="text-white/30 text-[11px] mt-4 relative z-10">
-            امسح الكود لعرض فاتورة الطلب بالتفصيل
-          </p>
+          <div className="mt-4 relative z-10 bg-white/5 border border-white/10 rounded-xl py-2 px-4 inline-block">
+            <p className="text-white/90 text-sm font-bold tracking-wide">
+              🧾 امسح الكود لعرض الفاتورة
+            </p>
+          </div>
 
           {status === 'delivered' && googleMapsUrl && (
             <motion.div 
